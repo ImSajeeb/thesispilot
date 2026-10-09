@@ -1,0 +1,41 @@
+/* Pending registrations — Onyx / Copper theme */
+.pending-registrations-page{--pending-copper:#d9824b;--pending-copper-bright:#f09a62;--pending-surface:#191919;--pending-border:#343434;--pending-muted:#a3a3a3;max-width:1500px;min-height:calc(100vh - 100px);color:#f1f1f1}
+body:has(.pending-registrations-page){background:#111}
+.pending-registrations-page .pending-page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;margin:.25rem 0 2rem;padding:.35rem 0 1.4rem;border-bottom:1px solid var(--pending-border)}
+.pending-registrations-page .pending-eyebrow,.pending-registrations-page .pending-section-kicker{display:inline-flex;align-items:center;gap:.5rem;color:var(--pending-copper-bright);font-size:.7rem;font-weight:800;letter-spacing:.14em}
+.pending-registrations-page .pending-page-header h1{color:#f7f7f7;font-size:clamp(1.7rem,3vw,2.25rem);font-weight:800;letter-spacing:-.045em;margin:.55rem 0 .45rem}
+.pending-registrations-page .pending-heading-copy p{color:var(--pending-muted);margin:0}
+.pending-registrations-page .pending-back-link{display:inline-flex;align-items:center;gap:.55rem;padding:.7rem .95rem;border:1px solid #3b3b3b;border-radius:10px;color:#ddd;text-decoration:none;background:#1b1b1b;font-size:.88rem;font-weight:650;white-space:nowrap}
+.pending-registrations-page .pending-back-link:hover{color:var(--pending-copper-bright);border-color:#89583d;background:#24201d}
+.pending-registrations-page .pending-panel{background:var(--pending-surface);border:1px solid var(--pending-border);border-radius:16px;overflow:hidden;box-shadow:0 16px 38px #0003}
+.pending-registrations-page .pending-panel-header{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.35rem 1.5rem;border-bottom:1px solid var(--pending-border)}
+.pending-registrations-page .pending-panel-header h2{color:#f4f4f4;font-size:1.12rem;font-weight:750;margin:.35rem 0 .25rem}
+.pending-registrations-page .pending-panel-header p{color:var(--pending-muted);font-size:.86rem;margin:0}
+.pending-registrations-page .pending-count{display:inline-flex;align-items:center;gap:.55rem;white-space:nowrap;color:#f1c09e;background:#d9824b1f;border:1px solid #d9824b47;padding:.48rem .8rem;border-radius:999px;font-size:.8rem;font-weight:750}
+.pending-registrations-page .pending-count-dot{width:7px;height:7px;border-radius:50%;background:var(--pending-copper-bright)}
+.pending-registrations-page .table-responsive{width:100%}
+.pending-registrations-page .pending-table{margin:0;min-width:850px;color:#e7e7e7}
+.pending-registrations-page .pending-table thead th{background:#202020;color:#9d9d9d;border-bottom:1px solid #393939;padding:1rem 1.2rem;font-size:.69rem;text-transform:uppercase;letter-spacing:.09em;font-weight:800;white-space:nowrap}
+.pending-registrations-page .pending-table tbody td{padding:1.1rem 1.2rem;vertical-align:middle;border-bottom:1px solid #2d2d2d;background:transparent;color:#dedede}
+.pending-registrations-page .pending-table tbody tr:last-child td{border-bottom:0}
+.pending-registrations-page .pending-table tbody tr:hover td{background:#22201e}
+.pending-registrations-page .pending-student-name{color:#f5f5f5;font-weight:750}
+.pending-registrations-page .pending-student-id{color:#929292;font:.77rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;margin-top:.3rem}
+.pending-registrations-page .pending-email{display:flex;align-items:center;gap:.5rem;color:#e2e2e2;font-size:.86rem;overflow-wrap:anywhere}
+.pending-registrations-page .pending-email i{color:#a9a9a9}
+.pending-registrations-page .pending-status,.pending-registrations-page .pending-session{display:inline-flex;align-items:center;gap:.35rem;padding:.34rem .58rem;border-radius:6px;font-size:.72rem;font-weight:750;white-space:nowrap}
+.pending-registrations-page .pending-status-verified{color:#e8b18c;background:#d9824b21;border:1px solid #d9824b40}
+.pending-registrations-page .pending-status-unverified{color:#ffaaaa;background:#dc46461a;border:1px solid #dc46463d}
+.pending-registrations-page .pending-session{color:#d6c3b5;background:#2a2521;border:1px solid #49392e}
+.pending-registrations-page .pending-year-range{color:#999;font-size:.78rem;margin-top:.45rem}
+.pending-registrations-page .pending-date{color:#b7b7b7!important;font-size:.84rem;white-space:nowrap}
+.pending-registrations-page .pending-approve-btn,.pending-registrations-page .pending-reject-btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;border-radius:8px;padding:.5rem .75rem;font-size:.8rem;font-weight:750;transition:all .18s ease;white-space:nowrap}
+.pending-registrations-page .pending-approve-btn{color:#f4c5a5;background:#d9824b24;border:1px solid #d9824b57}
+.pending-registrations-page .pending-approve-btn:hover{color:#17110d;background:var(--pending-copper-bright);border-color:var(--pending-copper-bright)}
+.pending-registrations-page .pending-reject-btn{color:#e5a3a3;background:#211a1a;border:1px solid #533131}
+.pending-registrations-page .pending-reject-btn:hover{color:#fff;background:#742d2d;border-color:#9b4141}
+.pending-registrations-page .pending-empty-state{padding:4.5rem 1.5rem;text-align:center}
+.pending-registrations-page .pending-empty-icon{width:64px;height:64px;display:grid;place-items:center;margin:0 auto 1.2rem;border-radius:18px;background:#d9824b1a;border:1px solid #d9824b38;color:var(--pending-copper-bright);font-size:1.8rem}
+.pending-registrations-page .pending-empty-state h3{color:#f3f3f3;font-size:1.1rem;font-weight:750}
+.pending-registrations-page .pending-empty-state p{color:#9c9c9c;margin:0;font-size:.9rem}
+@media(max-width:767.98px){.pending-registrations-page{padding-top:1.25rem!important}.pending-registrations-page .pending-page-header{align-items:flex-start;flex-direction:column;margin-bottom:1.25rem}.pending-registrations-page .pending-back-link{align-self:flex-start}.pending-registrations-page .pending-panel-header{align-items:flex-start;flex-direction:column;padding:1.1rem}.pending-registrations-page .pending-table thead th,.pending-registrations-page .pending-table tbody td{padding:.9rem}}

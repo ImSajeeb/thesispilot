@@ -1,0 +1,506 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/allocation.css">
+
+<main class="container-fluid allocation-page py-4 px-md-4">
+    
+    <!-- Header & Session Selector -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bolder text-dark mb-1" style="letter-spacing: -0.5px;">Allocation Center</h2>
+            <p class="text-secondary mb-0">Automated thesis matching workflow.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-4 shadow-sm border">
+            <span class="text-secondary small fw-bold px-2">SESSION:</span>
+            <form method="GET" action="/chairman/allocation" class="m-0">
+                <select name="session_id" class="form-select border-0 bg-light fw-bold text-primary" style="width: 250px;" onchange="this.form.submit()">
+                    <option value="">-- Choose Session --</option>
+                    <% sessions.forEach(session => { %>
+                        <option value="<%= session.id %>" <%= Number(selectedSessionId) === Number(session.id) ? 'selected' : '' %>>
+                            <%= session.session_name %> <%= session.status === 'active' ? ' [Active]' : '' %>
+                        </option>
+                    <% }) %>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <% if (selectedSessionId) { %>
+
+        <% 
+            // Determine Step Logic
+            let step = 1;
+            let progress = "0%";
+            if (allocationRun) {
+                if (allocationRun.status === 'open') { step = 2; progress = "33%"; }
+                else if (allocationRun.status === 'preview') { step = 3; progress = "66%"; }
+                else if (allocationRun.status === 'confirmed' || allocationRun.status === 'locked') { step = 4; progress = "100%"; }
+            }
+        %>
+
+        <!-- Visual Stepper Bar -->
+        <div class="wizard-card p-4 pb-3 mb-4">
+            <div class="stepper-wrapper">
+                <div class="stepper-progress" style="width: <%= progress %>;"></div>
+                
+                <div class="step-item <%= step >= 1 ? (step > 1 ? 'completed' : 'active') : '' %>">
+                    <div class="step-icon"><% if(step > 1){ %><i class="bi bi-check-lg"></i><% } else { %>1<% } %></div>
+                    <div class="step-label">Strategy</div>
+                </div>
+                
+                <div class="step-item <%= step >= 2 ? (step > 2 ? 'completed' : 'active') : '' %>">
+                    <div class="step-icon"><% if(step > 2){ %><i class="bi bi-check-lg"></i><% } else { %>2<% } %></div>
+                    <div class="step-label">Participants</div>
+                </div>
+                
+                <div class="step-item <%= step >= 3 ? (step > 3 ? 'completed' : 'active') : '' %>">
+                    <div class="step-icon"><% if(step > 3){ %><i class="bi bi-check-lg"></i><% } else { %>3<% } %></div>
+                    <div class="step-label">Preview Draft</div>
+                </div>
+                
+                <div class="step-item <%= step >= 4 ? (step > 4 ? 'completed' : 'active') : '' %>">
+                    <div class="step-icon"><% if(step > 4){ %><i class="bi bi-check-lg"></i><% } else { %>4<% } %></div>
+                    <div class="step-label">Final Roster</div>
+                </div>
+            </div>
+            
+            <!-- Quick Summary Stats Strip -->
+            <div class="row g-2 text-center border-top pt-3 mt-2">
+                <div class="col"><div class="small text-muted fw-bold text-uppercase">Eligible Students</div><div class="fs-5 fw-bolder text-dark"><%= summary.eligibleStudents %></div></div>
+                <div class="col"><div class="small text-muted fw-bold text-uppercase">Subm. Prefs</div><div class="fs-5 fw-bolder text-success"><%= summary.studentsWithPreferences %></div></div>
+                <div class="col"><div class="small text-muted fw-bold text-uppercase">Available Faculty</div><div class="fs-5 fw-bolder text-primary"><%= summary.availableSupervisors %></div></div>
+                <div class="col border-start"><div class="small text-muted fw-bold text-uppercase">Total Capacity</div><div class="fs-5 fw-bolder text-dark"><%= summary.totalCapacity %></div></div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- STEP 1: INITIALIZE STRATEGY                -->
+        <!-- ========================================== -->
+        <% if (step === 1) { %>
+            <div class="wizard-card p-5 text-center">
+                <div class="mb-4">
+                    <h3 class="fw-bolder text-dark">Algorithm Strategy</h3>
+                    <p class="text-secondary mx-auto" style="max-width: 600px;">Select how the engine should prioritize student assignments for this session.</p>
+                </div>
+
+                <form method="POST" action="/chairman/allocation/open" class="mx-auto" style="max-width: 800px;">
+                    <input type="hidden" name="session_id" value="<%= selectedSessionId %>">
+                    
+                    <div class="row g-3 text-start mb-5">
+                        <div class="col-md-6">
+                            <label class="strategy-card">
+                                <input type="radio" name="strategy" value="preference_priority" checked>
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-dark d-flex align-items-center"><i class="bi bi-1-circle-fill text-secondary strategy-icon me-2 fs-5"></i> Preference Priority</h6>
+                                    <p class="small text-muted mb-0 mt-2">Respects student choices first. Attempts to give everyone their highest possible requested supervisor.</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="strategy-card">
+                                <input type="radio" name="strategy" value="balanced">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-dark d-flex align-items-center"><i class="bi bi-diagram-3-fill text-secondary strategy-icon me-2 fs-5"></i> Balanced Allocation</h6>
+                                    <p class="small text-muted mb-0 mt-2">Ignores preferences entirely. Distributes students evenly across all available faculty workloads.</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="strategy-card">
+                                <input type="radio" name="strategy" value="hybrid">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-dark d-flex align-items-center"><i class="bi bi-intersect text-secondary strategy-icon me-2 fs-5"></i> Hybrid Method</h6>
+                                    <p class="small text-muted mb-0 mt-2">Tries student preferences first, but safely falls back to the balanced method if all choices are full.</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="strategy-card">
+                                <input type="radio" name="strategy" value="random_lottery">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-dark d-flex align-items-center"><i class="bi bi-dice-5-fill text-secondary strategy-icon me-2 fs-5"></i> Random Lottery</h6>
+                                    <p class="small text-muted mb-0 mt-2">Pure randomization. Assigns students to supervisors completely randomly based on capacity limits.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg px-5 btn-action shadow-sm" onclick="return confirm('Open a new allocation run for this session?');">
+                        Start Selection Workflow <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        <% } %>
+
+        <!-- ========================================== -->
+        <!-- STEP 2: SELECT PARTICIPANTS                -->
+        <!-- ========================================== -->
+        <% if (step === 2) { %>
+            <form method="POST" action="/chairman/allocation/participants" id="participantForm">
+                <input type="hidden" name="session_id" value="<%= allocationRun.session_id %>">
+                
+                <div class="row g-4 mb-4">
+                    <!-- Students Selector -->
+                    <div class="col-lg-6">
+                        <div class="wizard-card h-100 mb-0 d-flex flex-column border border-secondary border-opacity-10">
+                            <div class="p-4 border-bottom bg-light">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="fw-bolder mb-0"><i class="bi bi-mortarboard text-primary me-2"></i>Select Students</h6>
+                                        <div class="small text-muted mt-1">Included: <span id="studentCount" class="fw-bold text-primary">0</span> / <%= students.length %></div>
+                                    </div>
+                                    <div class="form-check form-switch form-check-reverse">
+                                        <input class="form-check-input" type="checkbox" id="selectAllStudents">
+                                        <label class="form-check-label small fw-bold text-dark" for="selectAllStudents">Select All</label>
+                                    </div>
+                                </div>
+                                <input type="text" id="searchStudents" class="form-control form-control-sm border-0 shadow-sm" placeholder="Search student name or ID...">
+                            </div>
+                            <div class="table-responsive flex-grow-1" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-custom table-hover-row m-0" id="studentsTable">
+                                    <tbody>
+                                        <% students.forEach(student => { %>
+                                            <tr class="searchable-row">
+                                                <td style="width: 40px;">
+                                                    <input class="form-check-input student-checkbox" type="checkbox" name="student_ids" value="<%= student.id %>" 
+                                                        <%= (typeof selectedStudentIds !== 'undefined' && selectedStudentIds.includes(Number(student.id))) ? 'checked' : '' %> 
+                                                        <%= Number(student.is_allocated) === 1 ? 'disabled' : '' %>>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold text-dark searchable-name"><%= student.name %></div>
+                                                    <div class="small text-secondary searchable-id"><%= student.student_id %></div>
+                                                </td>
+                                                <td class="text-end">
+                                                    <% if (Number(student.is_allocated) === 1) { %> <span class="badge-soft-success">Allocated</span>
+                                                    <% } else if (Number(student.preference_count) > 0) { %> <span class="badge-soft-info"><%= student.preference_count %> Prefs</span>
+                                                    <% } else { %> <span class="badge-soft-danger">No Prefs</span> <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Faculty Selector -->
+                    <div class="col-lg-6">
+                        <div class="wizard-card h-100 mb-0 d-flex flex-column border border-secondary border-opacity-10">
+                            <div class="p-4 border-bottom bg-light">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h6 class="fw-bolder mb-0"><i class="bi bi-person-badge text-success me-2"></i>Select Faculty</h6>
+                                        <div class="small text-muted mt-1">Included: <span id="supervisorCount" class="fw-bold text-success">0</span> / <%= supervisors.length %></div>
+                                    </div>
+                                    <div class="form-check form-switch form-check-reverse">
+                                        <input class="form-check-input" type="checkbox" id="selectAllSupervisors">
+                                        <label class="form-check-label small fw-bold text-dark" for="selectAllSupervisors">Select All</label>
+                                    </div>
+                                </div>
+                                <input type="text" id="searchSupervisors" class="form-control form-control-sm border-0 shadow-sm" placeholder="Search faculty name...">
+                            </div>
+                            <div class="table-responsive flex-grow-1" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-custom table-hover-row m-0" id="supervisorsTable">
+                                    <tbody>
+                                        <% supervisors.forEach(sup => { 
+                                            const capacity = Number(sup.session_capacity || 0);
+                                            const assigned = Number(sup.assigned_count || 0);
+                                            const remaining = Math.max(0, capacity - assigned);
+                                            const isAvailable = Number(sup.is_available) === 1 && sup.account_status === 'active' && remaining > 0;
+                                        %>
+                                            <tr class="searchable-row">
+                                                <td style="width: 40px;">
+                                                    <input class="form-check-input supervisor-checkbox" type="checkbox" name="supervisor_ids" value="<%= sup.id %>" 
+                                                        <%= (typeof selectedSupervisorIds !== 'undefined' && selectedSupervisorIds.includes(Number(sup.id))) ? 'checked' : '' %> 
+                                                        <%= isAvailable ? '' : 'disabled' %>>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold text-dark searchable-name"><%= sup.name %></div>
+                                                    <div class="small text-secondary">Load: <%= assigned %> / <%= capacity %></div>
+                                                </td>
+                                                <td class="text-end">
+                                                    <% if (isAvailable) { %> <span class="badge-soft-success"><%= remaining %> Slots</span>
+                                                    <% } else { %> <span class="badge-soft-danger">Full / Unavail</span> <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <!-- <div class="wizard-card p-4 d-flex justify-content-between align-items-center border border-primary border-opacity-25 bg-primary bg-opacity-10">
+                    <div class="text-dark small fw-bold d-none d-md-block">
+                        <i class="bi bi-info-circle-fill text-primary me-1"></i> Save your selections to unlock the algorithm generator.
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-action px-5 shadow-sm" <%= students.length === 0 || supervisors.length === 0 ? 'disabled' : '' %>>
+                        Save Participants <i class="bi bi-save ms-2"></i>
+                    </button>
+                </div> -->
+
+                <!-- Action Bar -->
+<div class="wizard-card p-4 d-flex justify-content-between align-items-center border border-primary border-opacity-25 bg-primary bg-opacity-10">
+    <div class="text-dark small fw-bold d-none d-md-block">
+        <i class="bi bi-info-circle-fill text-primary me-1"></i> Save your selections to unlock the algorithm generator.
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-danger btn-action shadow-sm" onclick="document.getElementById('discardRunForm').submit();">
+            <i class="bi bi-trash3"></i> Start Over
+        </button>
+        <button type="submit" class="btn btn-primary btn-action px-5 shadow-sm" <%= students.length === 0 || supervisors.length === 0 ? 'disabled' : '' %>>
+            Save Participants <i class="bi bi-save ms-2"></i>
+        </button>
+    </div>
+</div>
+            </form>
+
+            <!-- Hidden form for the Start Over button -->
+<form id="discardRunForm" method="POST" action="/chairman/allocation/discard" style="display: none;">
+    <input type="hidden" name="session_id" value="<%= allocationRun.session_id %>">
+</form>
+
+            <!-- Generate Preview Panel -->
+            <% if (selectedStudentIds && selectedStudentIds.length > 0) { %>
+                <div class="wizard-card allocation-preview-card p-5 text-center mt-5">
+                    <div class="allocation-preview-icon mx-auto mb-3" aria-hidden="true">
+                        <i class="bi bi-magic"></i>
+                    </div>
+                    <div class="allocation-preview-kicker mb-2">DRAFT GENERATION</div>
+                    <h4 class="fw-bolder text-dark mb-3">Ready to run the algorithm</h4>
+                    <p class="text-secondary mb-4 mx-auto" style="max-width: 600px;">
+                        The engine will process your <strong><%= selectedStudentIds.length %></strong> selected students against the <strong><%= allocationRun.strategy.replace(/_/g, ' ').toUpperCase() %></strong> logic. This generates a safe, reviewable draft.
+                    </p>
+                    <form method="POST" action="/chairman/allocation/generate-preview" id="generatePreviewForm">
+                        <input type="hidden" name="session_id" value="<%= allocationRun.session_id %>">
+                        <button type="submit" class="btn btn-warning text-dark btn-lg px-5 fw-bold btn-action shadow">
+                            <i class="bi bi-magic me-2"></i> Generate Draft Preview
+                        </button>
+                    </form>
+                </div>
+            <% } %>
+        <% } %>
+
+        <!-- ========================================== -->
+        <!-- STEP 3: PREVIEW DRAFT RESULTS              -->
+        <!-- ========================================== -->
+        <% if (step === 3) { %>
+            <% 
+                const safePreviewResults = (typeof previewResults !== 'undefined' && Array.isArray(previewResults)) ? previewResults : [];
+                const previewAssigned = safePreviewResults.filter(row => row.result_status === 'assigned');
+                const previewUnassigned = safePreviewResults.filter(row => row.result_status === 'unassigned');
+            %>
+            <div class="wizard-card border border-primary border-opacity-25">
+                <div class="p-4 border-bottom bg-light d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                    <div>
+                        <h5 class="fw-bolder text-dark mb-1">Draft Preview Results</h5>
+                        <p class="small text-muted mb-0">Review the generated matches. Nothing is permanent yet.</p>
+                    </div>
+                    <div class="d-flex gap-3 mt-3 mt-md-0">
+                        <div class="bg-white px-3 py-2 rounded shadow-sm text-center border"><div class="fw-bolder text-success fs-5 lh-1"><%= previewAssigned.length %></div><div class="small text-muted text-uppercase mt-1" style="font-size:0.65rem; font-weight:bold;">Assigned</div></div>
+                        <div class="bg-white px-3 py-2 rounded shadow-sm text-center border"><div class="fw-bolder text-danger fs-5 lh-1"><%= previewUnassigned.length %></div><div class="small text-muted text-uppercase mt-1" style="font-size:0.65rem; font-weight:bold;">Failed</div></div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-custom m-0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Matched Supervisor</th>
+                                <th>Algorithm Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% safePreviewResults.forEach((result) => { %>
+                                <tr class="<%= result.result_status === 'assigned' ? 'row-assigned' : 'row-unassigned' %> table-hover-row">
+                                    <td>
+                                        <div class="fw-bold text-dark"><%= result.student_name %></div>
+                                        <div class="text-secondary small font-monospace"><%= result.student_code %></div>
+                                    </td>
+                                    <td>
+                                        <% if (result.result_status === 'assigned') { %>
+                                            <div class="fw-bold text-primary"><i class="bi bi-person-check-fill me-1"></i><%= result.supervisor_name %></div>
+                                        <% } else { %>
+                                            <span class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>No match found</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (result.result_status === 'assigned') { %>
+                                            <span class="badge-soft-success">Assigned</span>
+                                            <% if (result.priority_matched) { %><span class="badge-soft-info ms-1">Choice #<%= result.priority_matched %></span><% } %>
+                                        <% } else { %>
+                                            <span class="badge-soft-danger">Unassigned</span>
+                                        <% } %>
+                                        <div class="small text-secondary mt-1"><%= result.reason %></div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="p-4 bg-light border-top d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                    <form method="POST" action="/chairman/allocation/discard" class="m-0">
+                        <input type="hidden" name="session_id" value="<%= allocationRun.session_id %>">
+                        <button type="submit" class="btn btn-light border text-danger fw-bold btn-action shadow-sm" onclick="return confirm('Discard this preview and go back to step 2?');">
+                            <i class="bi bi-trash3 me-1"></i> Discard & Retry
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="/chairman/allocation/confirm" class="m-0">
+                        <input type="hidden" name="session_id" value="<%= allocationRun.session_id %>">
+                        <button type="submit" class="btn btn-success btn-action px-5 shadow" onclick="return confirm('Officially confirm these assignments?');">
+                            Approve & Confirm Roster <i class="bi bi-check-circle-fill ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- ========================================== -->
+        <!-- STEP 4: FINAL ROSTER & LOCK                -->
+        <!-- ========================================== -->
+        <% if (step === 4) { %>
+            <% const isLocked = allocationRun.status === 'locked'; %>
+            
+            <% if (!isLocked) { %>
+                <div class="alert alert-warning border-warning shadow-sm rounded-4 p-4 d-flex align-items-center mb-4">
+                    <i class="bi bi-exclamation-triangle-fill fs-2 text-warning me-3"></i>
+                    <div>
+                        <h5 class="fw-bolder text-dark mb-1">Final Step: Lock the Roster</h5>
+                        <p class="mb-0 text-dark">The assignments are confirmed but hidden. You must <strong>Lock</strong> the allocation to publish it to student and supervisor dashboards.</p>
+                    </div>
+                    <form method="POST" action="/chairman/allocation/lock" class="ms-auto m-0">
+                        <input type="hidden" name="session_id" value="<%= allocationRun.session_id %>">
+                        <button type="submit" class="btn btn-dark btn-action px-4 shadow" onclick="return confirm('PERMANENT ACTION: Are you sure you want to lock this allocation? Students will instantly see their results.');">
+                            <i class="bi bi-lock-fill me-1"></i> Lock & Publish
+                        </button>
+                    </form>
+                </div>
+            <% } else { %>
+                <div class="alert alert-success border-success shadow-sm rounded-4 p-4 d-flex align-items-center mb-4">
+                    <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
+                    <div>
+                        <h5 class="fw-bolder text-dark mb-0">Allocation Successfully Locked & Published</h5>
+                        <p class="mb-0 text-dark small mt-1">Students can now begin submitting their thesis proposals to their assigned supervisors.</p>
+                    </div>
+                </div>
+            <% } %>
+
+       <div class="wizard-card print-header">
+                <div class="card-header bg-transparent border-bottom pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bolder text-dark mb-0">Official Master Roster</h5>
+                    <button onclick="window.print()" class="btn btn-outline-dark btn-sm fw-bold btn-action d-print-none shadow-sm">
+                        <i class="bi bi-printer-fill me-1"></i> Print Roster
+                    </button>
+                </div>
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-custom table-hover-row m-0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Assigned Supervisor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (typeof finalAllocations !== 'undefined') { %>
+                                <% finalAllocations.forEach((alloc) => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark"><%= alloc.student_name %></div>
+                                            <div class="text-secondary small font-monospace"><%= alloc.student_code %></div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-primary"><i class="bi bi-person-badge me-1"></i><%= alloc.supervisor_name %></div>
+                                            <div class="text-secondary small">ID: <%= alloc.supervisor_code %></div>
+                                        </td>
+                                        <td>
+                                            <span class="badge-soft-success text-uppercase"><i class="bi bi-check-circle-fill me-1"></i><%= alloc.allocation_status %></span>
+                                            <% if (alloc.priority_matched) { %><span class="badge-soft-info ms-1">Choice #<%= alloc.priority_matched %></span><% } %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+
+    <% } else { %>
+        <!-- No Session Selected Zero State -->
+        <div class="wizard-card p-5 text-center my-5 border border-secondary border-opacity-10">
+            <div class="d-inline-flex align-items-center justify-content-center bg-light text-secondary rounded-circle mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-hdd-network fs-1"></i>
+            </div>
+            <h4 class="fw-bolder text-dark">Select a Session to Begin</h4>
+            <p class="text-muted mx-auto" style="max-width: 400px;">Use the dropdown menu at the top right to select an academic session and manage its thesis allocations.</p>
+        </div>
+    <% } %>
+
+</main>
+
+<script>
+    // JS Logic for Step 2 Select All Checkboxes
+    function setupCheckboxes(selectAllId, checkboxClass, countId) {
+        const selectAll = document.getElementById(selectAllId);
+        const checkboxes = document.querySelectorAll(`.${checkboxClass}:not(:disabled)`);
+        const countSpan = document.getElementById(countId);
+
+        function updateState() {
+            const checkedBoxes = document.querySelectorAll(`.${checkboxClass}:checked`);
+            if (countSpan) countSpan.textContent = checkedBoxes.length;
+            if (selectAll && checkboxes.length > 0) {
+                selectAll.checked = checkedBoxes.length === checkboxes.length;
+                selectAll.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+            }
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (e) => {
+                checkboxes.forEach(box => {
+                    // Only check visible ones if searching
+                    if(box.closest('tr').style.display !== 'none') {
+                        box.checked = e.target.checked;
+                    }
+                });
+                updateState();
+            });
+        }
+
+        checkboxes.forEach(box => box.addEventListener('change', updateState));
+        if(checkboxes.length > 0) updateState();
+    }
+
+    // JS Logic for Live Search Filtering
+    function setupSearch(inputId, tableId) {
+        const input = document.getElementById(inputId);
+        const table = document.getElementById(tableId);
+        if(!input || !table) return;
+
+        input.addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+            const rows = table.querySelectorAll('.searchable-row');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupCheckboxes('selectAllStudents', 'student-checkbox', 'studentCount');
+        setupCheckboxes('selectAllSupervisors', 'supervisor-checkbox', 'supervisorCount');
+        
+        setupSearch('searchStudents', 'studentsTable');
+        setupSearch('searchSupervisors', 'supervisorsTable');
+    });
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,137 @@
+<%- include('../partials/header') %>
+
+<style>
+    /* Ensure disabled select fields match the dark theme */
+    .form-select:disabled {
+        background-color: var(--bg-base) !important;
+        color: var(--text-muted) !important;
+        opacity: 0.7;
+    }
+</style>
+
+<div class="container py-5" style="max-width: 700px;">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bolder tp-text-main mb-1" style="letter-spacing: -0.5px;"><i class="bi bi-person-plus-fill me-2" style="color: var(--primary-color);"></i> Student Registration</h2>
+            <p class="tp-text-muted mb-0">Create your student account to join the thesis management platform.</p>
+        </div>
+        <a href="/auth/login" class="btn tp-btn-surface shadow-sm fw-semibold d-flex align-items-center py-2 px-3">← Back to Login</a>
+    </div>
+
+    <!-- Flash Messages (Commented out to avoid double rendering with header.ejs) -->
+    <% /* %>
+    <% if (errorMsg && errorMsg.length > 0) { %>
+        <div class="alert tp-alert-danger border-0 shadow-sm rounded-4 mb-4"><%= errorMsg %></div>
+    <% } %>
+    <% */ %>
+
+    <div class="tp-card border-0 p-0 overflow-hidden mb-4">
+        <div class="card-header border-bottom pt-4 pb-3 px-4" style="background: rgba(255, 255, 255, 0.02); border-color: var(--border-color) !important;">
+            <h5 class="fw-bolder tp-text-main mb-0"><i class="bi bi-mortarboard me-2" style="color: var(--primary-color);"></i> Account & Academic Details</h5>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            <form action="/auth/register" method="POST" autocomplete="off">
+                
+                <!-- Hidden dummy inputs to trick browser autofill -->
+                <input type="text" style="display:none" name="fakeusernameremembered">
+                <input type="password" style="display:none" name="fakepasswordremind">
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Full Name</label>
+                    <input type="text" class="form-control tp-form-control py-2.5 fw-semibold" name="name" required placeholder="Enter your full legal name" autocomplete="off">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Email Address</label>
+                    <input type="email" class="form-control tp-form-control py-2.5 fw-semibold" name="email" required placeholder="name@university.edu" autocomplete="off">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold tp-text-muted small text-uppercase">Password (Min. 4 chars)</label>
+                        <input type="password" class="form-control tp-form-control py-2.5 fw-semibold" name="password" minlength="4" required placeholder="••••••••" autocomplete="new-password">
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold tp-text-muted small text-uppercase">Confirm Password</label>
+                        <input type="password" class="form-control tp-form-control py-2.5 fw-semibold" name="confirm_password" minlength="4" required placeholder="••••••••" autocomplete="new-password">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold tp-text-muted small text-uppercase">Student ID / Roll</label>
+                        <input type="text" class="form-control tp-form-control py-2.5 fw-semibold" name="student_id" required placeholder="e.g. 2021001" autocomplete="off">
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold tp-text-muted small text-uppercase">Phone Number (Optional)</label>
+                        <input type="text" class="form-control tp-form-control py-2.5 fw-semibold" name="phone" placeholder="017xxxxxxxx" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Department</label>
+                    <select class="form-select tp-form-control py-2.5 fw-semibold" name="department_id" id="departmentSelect" required>
+                        <option value="" style="background: var(--bg-base); color: var(--text-main);">-- Select your department --</option>
+                        <% departments.forEach(dept => { %>
+                            <option value="<%= dept.id %>" style="background: var(--bg-base); color: var(--text-main);"><%= dept.name %> (<%= dept.code %>)</option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Academic Session</label>
+                    <select class="form-select tp-form-control py-2.5 fw-semibold" name="session_id" id="sessionSelect" required disabled>
+                        <option value="" style="background: var(--bg-base); color: var(--text-main);">-- Select Department First --</option>
+                        <% sessions.forEach(ses => { %>
+                            <option value="<%= ses.id %>" data-department="<%= ses.department_id %>" style="background: var(--bg-base); color: var(--text-main);"><%= ses.session_name %> (<%= ses.start_year %> - <%= ses.end_year %>)</option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn tp-btn-accent w-100 py-2.5 shadow mt-3">
+                    <i class="bi bi-check-circle-fill me-2"></i> Register Account
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deptSelect = document.getElementById('departmentSelect');
+    const sessionSelect = document.getElementById('sessionSelect');
+    
+    // Cache all session options
+    const allSessionOptions = Array.from(sessionSelect.querySelectorAll('option[data-department]'));
+
+    deptSelect.addEventListener('change', function() {
+        const selectedDeptId = String(this.value);
+
+        // Reset session dropdown
+        sessionSelect.innerHTML = '<option value="" style="background: var(--bg-base); color: var(--text-main);">-- Choose Active Session --</option>';
+
+        if (!selectedDeptId) {
+            sessionSelect.disabled = true;
+            return;
+        }
+
+        // Filter sessions matching selected department (coerced to strings for safety)
+        const matchingSessions = allSessionOptions.filter(
+            opt => String(opt.getAttribute('data-department')) === selectedDeptId
+        );
+
+        if (matchingSessions.length === 0) {
+            sessionSelect.innerHTML = '<option value="" style="background: var(--bg-base); color: var(--text-main);">No active sessions found</option>';
+            sessionSelect.disabled = true;
+        } else {
+            matchingSessions.forEach(opt => sessionSelect.appendChild(opt.cloneNode(true)));
+            sessionSelect.disabled = false;
+        }
+    });
+});
+</script>
+
+<%- include('../partials/footer') %>

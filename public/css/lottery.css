@@ -1,0 +1,113 @@
+/* Onyx–Copper Allocation Lottery — styles scoped to this page */
+body:has(.lottery-page) {
+    background: #101010;
+}
+.lottery-page {
+    --lottery-bg: #111111;
+    --lottery-panel: #191919;
+    --lottery-panel-raised: #202020;
+    --lottery-border: #303030;
+    --lottery-text: #f0efed;
+    --lottery-muted: #a5a19c;
+    --lottery-copper: #d97745;
+    --lottery-copper-light: #f09a68;
+    --lottery-danger: #e16c6c;
+    color: var(--lottery-text);
+    min-height: 75vh;
+}
+.lottery-page * { box-sizing: border-box; }
+.lottery-page-header {
+    display:flex; align-items:flex-start; justify-content:space-between; gap:24px;
+    margin: 0 0 26px; padding-bottom:22px; border-bottom:1px solid var(--lottery-border);
+}
+.lottery-heading { min-width:0; }
+.lottery-eyebrow {
+    display:inline-flex; align-items:center; gap:8px; color:var(--lottery-copper-light);
+    font-size:.7rem; font-weight:800; letter-spacing:.13em; margin-bottom:9px;
+}
+.lottery-heading h1 { color:#fff; font-size:clamp(1.65rem,2.5vw,2.15rem); font-weight:750; letter-spacing:-.035em; margin:0 0 8px; }
+.lottery-heading p { color:var(--lottery-muted); margin:0; max-width:740px; line-height:1.65; }
+.lottery-back-link {
+    display:inline-flex; align-items:center; gap:9px; flex-shrink:0; padding:10px 14px;
+    color:#d7d2cc; text-decoration:none; border:1px solid #383838; border-radius:10px;
+    background:#191919; font-size:.87rem; font-weight:650; transition:.18s ease;
+}
+.lottery-back-link:hover { color:#fff; border-color:var(--lottery-copper); background:#211b18; }
+.lottery-action-panel {
+    display:grid; grid-template-columns:64px minmax(0,1fr) auto; align-items:center; gap:22px;
+    padding:28px; margin-bottom:24px; border:1px solid #493328; border-radius:17px;
+    background:radial-gradient(ellipse at 0% 0%,rgba(217,119,69,.10),transparent 55%),linear-gradient(135deg,#1b1918,#171717 70%);
+    box-shadow:0 12px 32px rgba(0,0,0,.16);
+}
+.lottery-action-mark {
+    width:60px; height:60px; display:grid; place-items:center; border:1px solid #68452f;
+    border-radius:16px; background:rgba(217,119,69,.12); color:var(--lottery-copper-light); font-size:1.65rem;
+}
+.lottery-action-copy h2 { color:#fff; font-size:1.25rem; font-weight:750; margin:0 0 8px; }
+.lottery-action-copy p { max-width:760px; color:#b6b0aa; font-size:.92rem; line-height:1.7; margin:0 0 13px; }
+.lottery-action-meta { display:flex; flex-wrap:wrap; align-items:center; gap:12px; color:var(--lottery-muted); font-size:.79rem; }
+.lottery-action-meta i { color:var(--lottery-copper-light); margin-right:4px; }
+.lottery-pending-count { color:#e9e3dd; }
+.lottery-pending-count strong { color:var(--lottery-copper-light); font-size:1rem; }
+.lottery-meta-divider { width:1px; height:15px; background:#45403c; }
+.lottery-action-control { min-width:210px; display:flex; flex-direction:column; align-items:stretch; gap:9px; }
+.lottery-run-button {
+    display:inline-flex; align-items:center; justify-content:center; gap:9px; width:100%;
+    padding:13px 18px; border:1px solid #e18a58; border-radius:10px;
+    color:#1b120d; background:linear-gradient(135deg,#f0a06d,#d97745);
+    box-shadow:0 5px 16px rgba(217,119,69,.15); font-weight:800; font-size:.9rem; cursor:pointer; transition:.18s ease;
+}
+.lottery-run-button:hover:not(:disabled) { transform:translateY(-1px); filter:brightness(1.06); box-shadow:0 8px 20px rgba(217,119,69,.2); }
+.lottery-run-button i { font-size:1.1rem; }
+.lottery-run-button-disabled { color:#aaa39d; border-color:#444; background:#292929; box-shadow:none; cursor:not-allowed; }
+.lottery-action-control small { color:#a8a19a; text-align:center; font-size:.73rem; line-height:1.5; }
+.lottery-action-control small i { color:var(--lottery-copper-light); margin-right:3px; }
+.lottery-data-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; align-items:start; }
+.lottery-panel { min-width:0; overflow:hidden; border:1px solid var(--lottery-border); border-radius:15px; background:var(--lottery-panel); box-shadow:0 8px 24px rgba(0,0,0,.12); }
+.lottery-panel-header { display:flex; align-items:center; gap:13px; padding:20px 20px 18px; border-bottom:1px solid var(--lottery-border); }
+.lottery-panel-icon { display:grid; place-items:center; width:43px; height:43px; flex-shrink:0; border-radius:12px; font-size:1.15rem; }
+.lottery-icon-pending { color:#e9b477; background:rgba(217,153,69,.12); border:1px solid rgba(217,153,69,.23); }
+.lottery-icon-capacity { color:var(--lottery-copper-light); background:rgba(217,119,69,.12); border:1px solid rgba(217,119,69,.23); }
+.lottery-panel-title { min-width:0; flex:1; }
+.lottery-panel-title h2 { color:#f6f4f1; font-size:1rem; font-weight:750; margin:0 0 4px; }
+.lottery-panel-title p { color:var(--lottery-muted); font-size:.77rem; line-height:1.45; margin:0; }
+.lottery-count-badge { display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:30px; padding:0 8px; border:1px solid #4a3930; border-radius:8px; background:#28201c; color:var(--lottery-copper-light); font-size:.8rem; font-weight:800; }
+.lottery-table-wrap { width:100%; overflow-x:auto; }
+.lottery-table { width:100%; margin:0; border-collapse:collapse; color:#ddd8d2; font-size:.84rem; }
+.lottery-table thead th { padding:12px 16px; background:#202020; color:#9f9992; border-bottom:1px solid #353535; font-size:.68rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; white-space:nowrap; }
+.lottery-table tbody td { padding:14px 16px; border-bottom:1px solid #292929; vertical-align:middle; }
+.lottery-table tbody tr:last-child td { border-bottom:0; }
+.lottery-table tbody tr { transition:background .15s ease; }
+.lottery-table tbody tr:hover { background:#201e1c; }
+.lottery-student-name { color:#f0ede9; font-weight:700; min-width:125px; }
+.lottery-thesis-title { min-width:145px; color:#c3bdb6; line-height:1.55; overflow-wrap:anywhere; }
+.lottery-number { display:inline-flex; align-items:center; justify-content:center; min-width:29px; padding:5px 8px; border:1px solid #3b3733; border-radius:7px; color:#f3d2bb; background:#29221e; font-weight:750; font-variant-numeric:tabular-nums; }
+.lottery-number-muted { color:#c7c1ba; background:#242424; border-color:#383838; }
+.lottery-status { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:5px 9px; font-size:.7rem; font-weight:750; white-space:nowrap; }
+.lottery-status-open { color:#f0b18a; border:1px solid #5c3c2b; background:rgba(217,119,69,.1); }
+.lottery-status-full { color:#f09a9a; border:1px solid #603434; background:rgba(220,38,38,.1); }
+.lottery-empty-cell { height:180px; text-align:center; }
+.lottery-empty-cell i, .lottery-empty-cell strong, .lottery-empty-cell span { display:block; }
+.lottery-empty-cell i { color:var(--lottery-copper-light); font-size:1.5rem; margin-bottom:9px; }
+.lottery-empty-cell strong { color:#e8e3dd; font-size:.88rem; margin-bottom:5px; }
+.lottery-empty-cell span { color:var(--lottery-muted); font-size:.78rem; }
+.lottery-panel-footer { display:flex; align-items:flex-start; gap:8px; padding:12px 16px; color:#a39c95; background:#171717; border-top:1px solid #2b2b2b; font-size:.73rem; line-height:1.5; }
+.lottery-panel-footer i { color:var(--lottery-copper-light); margin-top:1px; }
+@media (max-width:1100px) {
+    .lottery-action-panel { grid-template-columns:54px minmax(0,1fr); }
+    .lottery-action-mark { width:52px; height:52px; }
+    .lottery-action-control { grid-column:2; max-width:280px; }
+    .lottery-data-grid { grid-template-columns:1fr; }
+}
+@media (max-width:600px) {
+    .lottery-page { padding-top:20px!important; }
+    .lottery-page-header { flex-direction:column; gap:16px; }
+    .lottery-action-panel { grid-template-columns:1fr; padding:20px; gap:15px; }
+    .lottery-action-mark { width:48px; height:48px; }
+    .lottery-action-control { grid-column:1; width:100%; max-width:none; }
+    .lottery-panel-header { padding:16px 13px; gap:10px; }
+    .lottery-panel-icon { width:38px; height:38px; }
+    .lottery-table { font-size:.78rem; }
+    .lottery-table thead th, .lottery-table tbody td { padding:12px 11px; }
+    .lottery-supervisor-table { min-width:450px; }
+}

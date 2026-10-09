@@ -1,0 +1,294 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/supervisors.css">
+
+<main class="supervisors-container container-fluid">
+    <header class="supervisors-page-header">
+        <div class="supervisors-heading-copy">
+            <span class="supervisors-eyebrow"><i class="bi bi-people-fill"></i> PEOPLE &amp; CAPACITY</span>
+            <h1>Department Supervisors</h1>
+            <p>Manage faculty accounts, availability, and academic-session capacity.</p>
+        </div>
+        <div class="supervisors-header-actions">
+            <button type="button" class="btn sup-btn sup-btn-secondary" data-bs-toggle="modal" data-bs-target="#capacityModal">
+                <i class="bi bi-sliders"></i><span>Set Capacity</span>
+            </button>
+            <button type="button" class="btn sup-btn sup-btn-primary" data-bs-toggle="modal" data-bs-target="#addSupervisorModal">
+                <i class="bi bi-person-plus-fill"></i><span>Add Faculty</span>
+            </button>
+        </div>
+    </header>
+
+    <section class="supervisors-filter-panel" aria-label="Supervisor filters">
+        <div class="supervisors-filter-intro">
+            <span class="sup-filter-icon"><i class="bi bi-funnel"></i></span>
+            <div>
+                <h2>Faculty directory</h2>
+                <p>Choose an academic session to review supervisor availability and load.</p>
+            </div>
+        </div>
+        <form method="GET" action="/chairman/supervisors" class="supervisors-filter-form">
+            <label for="supervisor-session" class="form-label">Academic session</label>
+            <select id="supervisor-session" name="session_id" class="form-select filter-select" onchange="this.form.submit()">
+                <% sessions.forEach(session => { %>
+                    <option value="<%= session.id %>" <%= Number(selectedSessionId) === Number(session.id) ? 'selected' : '' %>>
+                        <%= session.session_name %><%= session.status === 'active' ? ' (Active)' : '' %>
+                    </option>
+                <% }) %>
+            </select>
+        </form>
+    </section>
+
+    <section class="supervisors-table-card" aria-label="Department supervisors">
+        <div class="supervisors-table-heading">
+            <div>
+                <h2>Supervisors</h2>
+                <p>Faculty accounts and current student allocation</p>
+            </div>
+            <span class="sup-count-pill"><i class="bi bi-person-check"></i> <%= supervisors.length %> records</span>
+        </div>
+
+        <% if (supervisors.length === 0) { %>
+            <div class="supervisors-empty-state">
+                <span class="sup-empty-icon"><i class="bi bi-person-x"></i></span>
+                <h3>No supervisors found</h3>
+                <p>There are no faculty records for this session yet. Add a faculty member to get started.</p>
+                <button type="button" class="btn sup-btn sup-btn-primary" data-bs-toggle="modal" data-bs-target="#addSupervisorModal">
+                    <i class="bi bi-person-plus-fill"></i> Add Faculty
+                </button>
+            </div>
+        <% } else { %>
+            <div class="table-responsive supervisors-table-wrap">
+                <table class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Faculty member</th>
+                            <th scope="col">Credentials</th>
+                            <th scope="col">Specialization</th>
+                            <th scope="col">Availability &amp; load</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% supervisors.forEach(sup => {
+                            // Session override takes priority over the default capacity.
+                            let currentCapacity = sup.session_capacity !== null ? sup.session_capacity : sup.default_capacity;
+                            let assignedCount = sup.assigned_students || 0;
+                            let isFull = assignedCount >= currentCapacity;
+                            let capacityPercentage = currentCapacity > 0 ? Math.min(100, (assignedCount / currentCapacity) * 100) : 0;
+                        %>
+                            <tr>
+                                <td>
+                                    <div class="sup-person-cell">
+                                        <span class="sup-person-avatar"><%= sup.name ? sup.name.charAt(0).toUpperCase() : 'F' %></span>
+                                        <div class="sup-person-info">
+                                            <strong><%= sup.name %></strong>
+                                            <a href="mailto:<%= sup.email %>"><i class="bi bi-envelope"></i><%= sup.email %></a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="sup-faculty-id"><%= sup.supervisor_id %></span>
+                                    <span class="sup-designation"><%= sup.designation || 'Designation not set' %></span>
+                                </td>
+                                <td>
+                                    <span class="sup-specialization"><%= sup.specialization || 'Not specified' %></span>
+                                </td>
+                                <td class="sup-load-cell">
+                                    <div class="sup-status-list">
+                                        <% if (sup.is_available && !isFull) { %>
+                                            <span class="badge-soft-success">Available</span>
+                                        <% } else if (isFull) { %>
+                                            <span class="badge-soft-danger">Full capacity</span>
+                                        <% } else { %>
+                                            <span class="badge-soft-secondary">Unavailable</span>
+                                        <% } %>
+
+                                        <% if (sup.account_status !== 'active') { %>
+                                            <span class="badge-soft-warning">Account disabled</span>
+                                        <% } %>
+                                    </div>
+                                    <div class="sup-load-labels">
+                                        <span><strong><%= assignedCount %></strong> assigned</span>
+                                        <span><%= currentCapacity %> max</span>
+                                    </div>
+                                    <div class="progress-track"
+                                         role="progressbar"
+                                         aria-label="Student allocation for <%= sup.name %>"
+                                         aria-valuenow="<%= Math.round(capacityPercentage) %>"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        <div class="progress-fill <%= isFull ? 'is-full' : '' %>" style="width: <%= capacityPercentage %>%"></div>
+                                    </div>
+                                </td>
+                                <td class="sup-actions-cell">
+                                    <div class="sup-row-actions">
+                                        <button type="button" class="btn sup-btn-row sup-btn-edit" data-bs-toggle="modal" data-bs-target="#editModal-<%= sup.id %>">
+                                            <i class="bi bi-pencil-square"></i><span>Edit</span>
+                                        </button>
+                                        <form action="/chairman/supervisors/<%= sup.id %>/toggle-availability" method="POST">
+                                            <button type="submit" class="btn sup-btn-row <%= sup.is_available ? 'sup-btn-disable' : 'sup-btn-enable' %>">
+                                                <i class="bi <%= sup.is_available ? 'bi-pause-circle' : 'bi-play-circle' %>"></i>
+                                                <span><%= sup.is_available ? 'Set unavailable' : 'Set available' %></span>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <div class="modal fade sup-modal" id="editModal-<%= sup.id %>" tabindex="-1" aria-labelledby="editModalLabel-<%= sup.id %>" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <div>
+                                                        <span class="sup-modal-eyebrow">FACULTY DIRECTORY</span>
+                                                        <h2 class="modal-title" id="editModalLabel-<%= sup.id %>">Edit faculty member</h2>
+                                                    </div>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="/chairman/supervisors/<%= sup.id %>/update" method="POST">
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label for="edit-name-<%= sup.id %>" class="form-label">Full name</label>
+                                                            <input id="edit-name-<%= sup.id %>" type="text" name="name" class="form-control" value="<%= sup.name %>" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="edit-email-<%= sup.id %>" class="form-label">Email address</label>
+                                                            <input id="edit-email-<%= sup.id %>" type="email" name="email" class="form-control" value="<%= sup.email %>" required>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-sm-6 mb-3">
+                                                                <label for="edit-faculty-id-<%= sup.id %>" class="form-label">Faculty ID</label>
+                                                                <input id="edit-faculty-id-<%= sup.id %>" type="text" name="supervisor_id" class="form-control" value="<%= sup.supervisor_id %>" required>
+                                                            </div>
+                                                            <div class="col-sm-6 mb-3">
+                                                                <label for="edit-designation-<%= sup.id %>" class="form-label">Designation</label>
+                                                                <input id="edit-designation-<%= sup.id %>" type="text" name="designation" class="form-control" value="<%= sup.designation || '' %>">
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="edit-capacity-<%= sup.id %>" class="form-label">Default capacity</label>
+                                                            <input id="edit-capacity-<%= sup.id %>" type="number" name="capacity" min="0" class="form-control" value="<%= sup.default_capacity %>">
+                                                            <div class="form-text">A session-specific override takes precedence over this value.</div>
+                                                        </div>
+                                                        <div class="mb-1">
+                                                            <label for="edit-specialization-<%= sup.id %>" class="form-label">Specialization</label>
+                                                            <textarea id="edit-specialization-<%= sup.id %>" name="specialization" class="form-control" rows="3"><%= sup.specialization || '' %></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn sup-btn sup-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn sup-btn sup-btn-primary"><i class="bi bi-check2"></i> Save changes</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </section>
+</main>
+
+<!-- Add Faculty Modal -->
+<div class="modal fade sup-modal" id="addSupervisorModal" tabindex="-1" aria-labelledby="addSupervisorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span class="sup-modal-eyebrow">FACULTY DIRECTORY</span>
+                    <h2 class="modal-title" id="addSupervisorModalLabel">Register faculty</h2>
+                    <p class="sup-modal-subtitle">Create a supervisor account for your department.</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/chairman/supervisors/create" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="new-supervisor-name" class="form-label">Full name</label>
+                        <input id="new-supervisor-name" type="text" name="name" class="form-control" autocomplete="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-supervisor-email" class="form-label">Email address</label>
+                        <input id="new-supervisor-email" type="email" name="email" class="form-control" autocomplete="email" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label for="new-supervisor-id" class="form-label">Faculty ID</label>
+                            <input id="new-supervisor-id" type="text" name="supervisor_id" class="form-control" required>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <label for="new-supervisor-designation" class="form-label">Designation</label>
+                            <input id="new-supervisor-designation" type="text" name="designation" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label for="new-supervisor-password" class="form-label">Initial password</label>
+                        <input id="new-supervisor-password" type="password" name="password" minlength="6" class="form-control" autocomplete="new-password" required>
+                        <div class="form-text">Use at least 6 characters.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn sup-btn sup-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn sup-btn sup-btn-primary"><i class="bi bi-person-plus"></i> Create account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Session Capacity Modal -->
+<div class="modal fade sup-modal" id="capacityModal" tabindex="-1" aria-labelledby="capacityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span class="sup-modal-eyebrow">ALLOCATION SETTINGS</span>
+                    <h2 class="modal-title" id="capacityModalLabel">Set session capacity</h2>
+                    <p class="sup-modal-subtitle">Override a supervisor's default limit for one academic session.</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/chairman/supervisors/capacity" method="POST">
+                <div class="modal-body">
+                    <div class="sup-modal-note">
+                        <i class="bi bi-info-circle"></i>
+                        <span>This setting overrides the selected supervisor's default capacity for the chosen session only.</span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="capacity-supervisor" class="form-label">Select supervisor</label>
+                        <select id="capacity-supervisor" name="supervisor_id" class="form-select" required>
+                            <option value="">Choose faculty member</option>
+                            <% supervisors.forEach(sup => { %>
+                                <option value="<%= sup.id %>"><%= sup.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="capacity-session" class="form-label">Academic session</label>
+                        <select id="capacity-session" name="session_id" class="form-select" required>
+                            <option value="">Choose session</option>
+                            <% if (typeof sessions !== 'undefined') { %>
+                                <% sessions.forEach(session => { %>
+                                    <option value="<%= session.id %>" <%= Number(selectedSessionId) === Number(session.id) ? 'selected' : '' %>><%= session.session_name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <label for="capacity-limit" class="form-label">Maximum students allowed</label>
+                        <input id="capacity-limit" type="number" name="capacity" min="0" value="5" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn sup-btn sup-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn sup-btn sup-btn-primary"><i class="bi bi-sliders"></i> Save capacity</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

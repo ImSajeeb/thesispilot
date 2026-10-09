@@ -1,0 +1,36 @@
+{
+  "name": "thesispilot",
+  "version": "1.0.0",
+  "description": "University Thesis Management and Supervision Platform",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "thesis",
+    "university",
+    "academic-management",
+    "supervision"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
+    "connect-flash": "^0.1.1",
+    "csv-parser": "^3.2.1",
+    "dotenv": "^18.0.5",
+    "ejs": "^7.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "multer": "^2.4.0",
+    "multer-storage-cloudinary": "^2.2.1",
+    "mysql2": "^3.24.5",
+    "nodemailer": "^10.0.16"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.10"
+  }
+}

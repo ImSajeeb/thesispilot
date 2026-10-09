@@ -1,0 +1,232 @@
+<%- include('partials/header') %>
+
+<link rel="stylesheet" href="/css/home.css">
+
+<main class="home-page">
+    <section class="home-hero">
+        <div class="home-hero-glow home-hero-glow-one" aria-hidden="true"></div>
+        <div class="home-hero-glow home-hero-glow-two" aria-hidden="true"></div>
+
+        <div class="container home-hero-inner">
+            <div class="home-hero-copy">
+                <div class="home-eyebrow">
+                    <span class="home-eyebrow-mark"><i class="bi bi-diagram-3"></i></span>
+                    <span>THESIS MANAGEMENT · SUPERVISOR ALLOCATION</span>
+                </div>
+
+                <h1>From supervisor selection to thesis submission — <span>one connected workflow.</span></h1>
+                <p class="home-hero-description">
+                    A departmental workspace for organizing supervisor preferences, managing faculty capacity,
+                    reviewing thesis proposals, and tracking student progress through key research milestones.
+                </p>
+
+                <div class="home-hero-actions">
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <a href="/<%= user.role %>/dashboard" class="btn home-btn-primary">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            Open your dashboard
+                            <i class="bi bi-arrow-up-right home-btn-arrow"></i>
+                        </a>
+                    <% } else { %>
+                        <a href="/auth/login" class="btn home-btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Sign in to the portal
+                            <i class="bi bi-arrow-up-right home-btn-arrow"></i>
+                        </a>
+                        <a href="/auth/register" class="btn home-btn-secondary">
+                            Register as a student
+                        </a>
+                    <% } %>
+                </div>
+
+                <div class="home-trust-line">
+                    <span class="home-trust-dot"></span>
+                    <span>One shared process for students, supervisors, and department leadership</span>
+                </div>
+            </div>
+
+            <div class="home-workflow-panel" aria-label="Thesis workflow overview">
+                <div class="workflow-panel-top">
+                    <div>
+                        <span class="workflow-kicker">THE THESIS WORKFLOW</span>
+                        <h2>From allocation to evaluation</h2>
+                    </div>
+                    <span class="workflow-panel-icon"><i class="bi bi-bezier2"></i></span>
+                </div>
+
+                <div class="workflow-list">
+                    <div class="workflow-step">
+                        <div class="workflow-step-icon"><i class="bi bi-list-ol"></i></div>
+                        <div class="workflow-step-copy">
+                            <strong>01 <span>·</span> Supervisor preferences</strong>
+                            <p>Students submit ranked choices for available faculty.</p>
+                        </div>
+                        <i class="bi bi-check2 workflow-step-end"></i>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-icon"><i class="bi bi-diagram-2"></i></div>
+                        <div class="workflow-step-copy">
+                            <strong>02 <span>·</span> Allocation & assignment</strong>
+                            <p>Allocation considers preferences and supervisor capacity.</p>
+                        </div>
+                        <i class="bi bi-arrow-right workflow-step-end"></i>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-icon"><i class="bi bi-file-earmark-text"></i></div>
+                        <div class="workflow-step-copy">
+                            <strong>03 <span>·</span> Proposal review</strong>
+                            <p>Supervisors review submissions and provide feedback.</p>
+                        </div>
+                        <i class="bi bi-arrow-right workflow-step-end"></i>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-step">
+                        <div class="workflow-step-icon"><i class="bi bi-mortarboard"></i></div>
+                        <div class="workflow-step-copy">
+                            <strong>04 <span>·</span> Milestones & evaluation</strong>
+                            <p>Track thesis progress through final submission and grading.</p>
+                        </div>
+                        <i class="bi bi-arrow-right workflow-step-end"></i>
+                    </div>
+                </div>
+
+                <div class="workflow-panel-foot">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Role-based access for each stage of the process</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-capabilities">
+        <div class="container">
+            <div class="home-section-heading">
+                <div>
+                    <span class="home-section-kicker">BUILT AROUND THE PROCESS</span>
+                    <h2>Everything connected. Nothing scattered.</h2>
+                </div>
+                <p>Keep the core tasks of departmental thesis coordination in one structured workspace.</p>
+            </div>
+
+            <div class="row g-3 g-lg-4">
+                <div class="col-md-6 col-xl-4">
+                    <article class="capability-card">
+                        <div class="capability-card-top">
+                            <span class="capability-icon"><i class="bi bi-list-ol"></i></span>
+                            <span class="capability-number">01</span>
+                        </div>
+                        <h3>Preference-based allocation</h3>
+                        <p>Collect student rankings and coordinate supervisor assignments with faculty capacity in view.</p>
+                        <div class="capability-tag"><span></span> Preferences · Capacity · Assignment</div>
+                    </article>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <article class="capability-card">
+                        <div class="capability-card-top">
+                            <span class="capability-icon"><i class="bi bi-journal-check"></i></span>
+                            <span class="capability-number">02</span>
+                        </div>
+                        <h3>Proposal review & feedback</h3>
+                        <p>Manage thesis proposals, supporting files, supervisor comments, and revision decisions.</p>
+                        <div class="capability-tag"><span></span> Submission · Review · Revision</div>
+                    </article>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <article class="capability-card">
+                        <div class="capability-card-top">
+                            <span class="capability-icon"><i class="bi bi-arrow-left-right"></i></span>
+                            <span class="capability-number">03</span>
+                        </div>
+                        <h3>Transfer & swap requests</h3>
+                        <p>Route student transfer or mutual-swap requests through the required approval stages.</p>
+                        <div class="capability-tag"><span></span> Request · Approval · Tracking</div>
+                    </article>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <article class="capability-card">
+                        <div class="capability-card-top">
+                            <span class="capability-icon"><i class="bi bi-calendar2-check"></i></span>
+                            <span class="capability-number">04</span>
+                        </div>
+                        <h3>Milestone tracking</h3>
+                        <p>Keep proposal and final-thesis stages visible so students and supervisors can follow progress.</p>
+                        <div class="capability-tag"><span></span> Stages · Progress · Follow-up</div>
+                    </article>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <article class="capability-card">
+                        <div class="capability-card-top">
+                            <span class="capability-icon"><i class="bi bi-people"></i></span>
+                            <span class="capability-number">05</span>
+                        </div>
+                        <h3>Faculty capacity oversight</h3>
+                        <p>Support assignment decisions with a clearer view of supervisor availability and workload.</p>
+                        <div class="capability-tag"><span></span> Faculty · Workload · Oversight</div>
+                    </article>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <article class="capability-card">
+                        <div class="capability-card-top">
+                            <span class="capability-icon"><i class="bi bi-award"></i></span>
+                            <span class="capability-number">06</span>
+                        </div>
+                        <h3>Evaluation & completion</h3>
+                        <p>Support the closing stage with final submissions, supervisor evaluation, and recorded grades.</p>
+                        <div class="capability-tag"><span></span> Final file · Evaluation · Grade</div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-roles-section">
+        <div class="container">
+            <div class="home-roles-panel">
+                <div class="home-roles-copy">
+                    <span class="home-section-kicker">DESIGNED FOR DEPARTMENTAL COORDINATION</span>
+                    <h2>Clear responsibilities at every stage.</h2>
+                    <p>Each role works within its part of the thesis process, helping reduce fragmented communication and keep decisions traceable.</p>
+                </div>
+                <div class="home-role-list">
+                    <div class="home-role-item">
+                        <span class="home-role-icon"><i class="bi bi-mortarboard"></i></span>
+                        <div><strong>Students</strong><p>Choose preferences, submit thesis work, and follow feedback.</p></div>
+                    </div>
+                    <div class="home-role-item">
+                        <span class="home-role-icon"><i class="bi bi-person-workspace"></i></span>
+                        <div><strong>Supervisors</strong><p>Manage assigned students, review proposals, and evaluate submissions.</p></div>
+                    </div>
+                    <div class="home-role-item">
+                        <span class="home-role-icon"><i class="bi bi-building-gear"></i></span>
+                        <div><strong>Department leadership</strong><p>Oversee allocation, capacity, approvals, and user coordination.</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-final-cta">
+        <div class="container">
+            <div class="home-final-cta-inner">
+                <div>
+                    <span class="home-section-kicker">READY TO CONTINUE?</span>
+                    <h2>Move your thesis work forward.</h2>
+                    <p>Sign in to continue with the tasks available for your role.</p>
+                </div>
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <a href="/<%= user.role %>/dashboard" class="btn home-btn-primary">
+                        Go to dashboard <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                <% } else { %>
+                    <a href="/auth/login" class="btn home-btn-primary">
+                        Sign in to the portal <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                <% } %>
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

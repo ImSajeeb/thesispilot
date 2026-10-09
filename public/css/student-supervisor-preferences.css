@@ -1,0 +1,178 @@
+
+/* Student Supervisor Preferences — Onyx / Copper */
+.student-preferences-page {
+  --sp-bg: #101112;
+  --sp-panel: #181a1c;
+  --sp-panel-raised: #1e2023;
+  --sp-border: #303236;
+  --sp-text: #f0eee9;
+  --sp-muted: #a5a5a5;
+  --sp-copper: #d98a56;
+  --sp-copper-deep: #a95f35;
+  --sp-amber: #e3b36b;
+  --sp-red: #df7777;
+  min-height: calc(100vh - 70px);
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  padding: 1px 0 2.5rem;
+}
+.student-preferences-page .preferences-shell { max-width: 1480px; margin: 0 auto; }
+.student-preferences-page .page-kicker {
+  color: var(--sp-copper); font-size: .7rem; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; margin-bottom: .55rem;
+}
+.student-preferences-page .page-heading {
+  color: var(--sp-text) !important; font-size: clamp(1.65rem, 2.4vw, 2.15rem);
+  letter-spacing: -.045em; font-weight: 780; line-height: 1.15; margin-bottom: .55rem;
+}
+.student-preferences-page .page-subtitle { color: var(--sp-muted) !important; max-width: 680px; line-height: 1.65; }
+.student-preferences-page .preferences-topbar {
+  display:flex; justify-content:space-between; align-items:center; gap:1.5rem;
+  padding: .35rem 0 1.65rem; border-bottom:1px solid var(--sp-border); margin-bottom:1.5rem;
+}
+.student-preferences-page .btn-action {
+  border-radius: 9px; padding: .68rem 1.05rem; font-weight: 700; font-size:.86rem;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.student-preferences-page .btn-action:hover { transform: translateY(-1px); }
+.student-preferences-page .btn-copper {
+  color:#171310 !important; background:var(--sp-copper) !important; border:1px solid var(--sp-copper) !important;
+}
+.student-preferences-page .btn-copper:hover { background:#e7a477 !important; border-color:#e7a477 !important; }
+.student-preferences-page .btn-outline-copper {
+  color:var(--sp-copper) !important; background:transparent !important; border:1px solid #80553d !important;
+}
+.student-preferences-page .btn-outline-copper:hover { background:rgba(217,138,86,.1) !important; }
+.student-preferences-page .premium-card {
+  background:var(--sp-panel) !important; border:1px solid var(--sp-border) !important;
+  border-radius:15px !important; box-shadow:0 12px 32px rgba(0,0,0,.14) !important;
+  overflow:hidden; color:var(--sp-text); margin-bottom:1.5rem;
+}
+.student-preferences-page .card-header {
+  background:#1b1d20 !important; border-color:var(--sp-border) !important;
+}
+.student-preferences-page .card-header h5,
+.student-preferences-page .card-body h5,
+.student-preferences-page .card-body h6 { color:var(--sp-text) !important; }
+.student-preferences-page .text-dark { color:var(--sp-text) !important; }
+.student-preferences-page .text-secondary,
+.student-preferences-page .text-muted { color:var(--sp-muted) !important; }
+.student-preferences-page .text-primary,
+.student-preferences-page .text-success { color:var(--sp-copper) !important; }
+.student-preferences-page .bg-light { background:#202225 !important; }
+.student-preferences-page .border,
+.student-preferences-page .border-bottom,
+.student-preferences-page .border-top { border-color:var(--sp-border) !important; }
+.student-preferences-page .student-summary {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0;
+  background:linear-gradient(110deg,#1d1f21,#17191b) !important;
+}
+.student-preferences-page .student-summary-item { padding:.5rem 1.1rem; min-width:0; }
+.student-preferences-page .student-summary-item + .student-summary-item { border-left:1px solid var(--sp-border); }
+.student-preferences-page .summary-label {
+  color:#929292; display:block; text-transform:uppercase; font-size:.66rem;
+  font-weight:800; letter-spacing:.11em; margin-bottom:.5rem;
+}
+.student-preferences-page .summary-value { color:var(--sp-text); font-size:.96rem; font-weight:700; overflow-wrap:anywhere; }
+.student-preferences-page .notice-panel {
+  border-radius:11px !important; background:#202225 !important; color:#d5d0c8 !important;
+  border:1px solid #51402f !important; padding:1rem 1.1rem;
+}
+.student-preferences-page .notice-panel strong { color:var(--sp-amber); }
+.student-preferences-page .alert-info,
+.student-preferences-page .alert-warning,
+.student-preferences-page .alert-danger,
+.student-preferences-page .alert-success {
+  background:#202225 !important; color:#d5d0c8 !important;
+  border:1px solid var(--sp-border) !important; border-radius:11px !important;
+}
+.student-preferences-page .alert-info { border-left:3px solid var(--sp-copper) !important; }
+.student-preferences-page .alert-warning { border-left:3px solid var(--sp-amber) !important; }
+.student-preferences-page .alert-danger { border-left:3px solid var(--sp-red) !important; }
+.student-preferences-page .table-responsive { scrollbar-color:#454545 #1a1b1d; }
+.student-preferences-page .table-custom { margin-bottom:0; color:var(--sp-text); --bs-table-bg:transparent; --bs-table-color:var(--sp-text); }
+.student-preferences-page .table-custom thead th {
+  background:#202225 !important; color:#a8a39d !important; font-size:.68rem;
+  text-transform:uppercase; letter-spacing:.1em; font-weight:800; padding:1rem 1.1rem;
+  border-bottom:1px solid var(--sp-border) !important; white-space:nowrap;
+}
+.student-preferences-page .table-custom tbody td {
+  padding:1rem 1.1rem; vertical-align:middle; color:#e0ddd7 !important;
+  border-bottom:1px solid #292b2e !important; background:transparent;
+}
+.student-preferences-page .table-custom tbody tr:hover td { background:#202225 !important; }
+.student-preferences-page .table-custom tbody tr:last-child td { border-bottom:0 !important; }
+.student-preferences-page .supervisor-checkbox {
+  width:1.05rem; height:1.05rem; background-color:#111214; border-color:#666;
+  accent-color:var(--sp-copper); cursor:pointer;
+}
+.student-preferences-page .supervisor-checkbox:checked { background-color:var(--sp-copper); border-color:var(--sp-copper); }
+.student-preferences-page .capacity-value { font-size:.8rem; color:var(--sp-text); font-weight:750; margin-bottom:.45rem; }
+.student-preferences-page .progress { background:#303236 !important; border-radius:99px !important; overflow:hidden; }
+.student-preferences-page .progress-bar { background:var(--sp-copper) !important; }
+.student-preferences-page .available-count {
+  background:rgba(217,138,86,.1) !important; color:var(--sp-copper) !important;
+  border:1px solid rgba(217,138,86,.28) !important; font-size:.72rem;
+}
+.student-preferences-page .preference-item {
+  display:flex; align-items:center; justify-content:space-between; gap:.8rem;
+  margin-bottom:.6rem; padding:.85rem; border:1px solid var(--sp-border) !important;
+  border-radius:10px !important; background:#202225 !important; box-shadow:none !important;
+}
+.student-preferences-page .priority-number {
+  flex:0 0 34px; width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+  border-radius:9px; color:#171310 !important; background:var(--sp-copper) !important;
+  font-weight:850; font-size:.86rem;
+}
+.student-preferences-page .preference-item .btn-group { box-shadow:none !important; }
+.student-preferences-page .preference-item .btn {
+  color:#d7d1c9 !important; background:#292b2e !important; border-color:#424448 !important;
+}
+.student-preferences-page .preference-item .btn:hover { color:var(--sp-copper) !important; border-color:var(--sp-copper) !important; }
+.student-preferences-page #emptyPreferenceMessage {
+  border:1px dashed #48494c !important; background:#1d1f21 !important; color:var(--sp-muted) !important;
+}
+.student-preferences-page .form-control,
+.student-preferences-page .form-select {
+  background:#141517 !important; border:1px solid #3b3d41 !important; color:var(--sp-text) !important;
+  border-radius:9px; min-height:42px;
+}
+.student-preferences-page .form-control:focus,
+.student-preferences-page .form-select:focus {
+  border-color:var(--sp-copper) !important; box-shadow:0 0 0 .2rem rgba(217,138,86,.13) !important;
+}
+.student-preferences-page .btn-success,
+.student-preferences-page .btn-primary {
+  background:var(--sp-copper) !important; border-color:var(--sp-copper) !important; color:#171310 !important;
+}
+.student-preferences-page .btn-outline-secondary,
+.student-preferences-page .btn-light {
+  background:#242629 !important; color:#ddd7cf !important; border-color:#414348 !important;
+}
+.student-preferences-page .text-info { color:#d7a77e !important; }
+.student-preferences-page .text-warning { color:var(--sp-amber) !important; }
+.student-preferences-page .text-danger { color:var(--sp-red) !important; }
+.student-preferences-page .how-it-works { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; }
+.student-preferences-page .how-step {
+  padding:1rem; border:1px solid var(--sp-border); border-radius:10px; background:#1d1f21;
+  color:#c6c1b9; font-size:.82rem; line-height:1.55;
+}
+.student-preferences-page .how-step strong { display:block; color:var(--sp-text); margin-bottom:.35rem; }
+.student-preferences-page .how-step-number { color:var(--sp-copper); font-weight:850; font-size:.7rem; letter-spacing:.1em; display:block; margin-bottom:.5rem; }
+@media (max-width: 991.98px) {
+  .student-preferences-page .student-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .student-preferences-page .student-summary-item:nth-child(3) { border-left:0; }
+  .student-preferences-page .student-summary-item:nth-child(n+3) { border-top:1px solid var(--sp-border); padding-top:1rem; }
+  .student-preferences-page .how-it-works { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 575.98px) {
+  .student-preferences-page .preferences-topbar { align-items:flex-start; flex-direction:column; }
+  .student-preferences-page .preferences-topbar > div:last-child { width:100%; }
+  .student-preferences-page .preferences-topbar .btn { width:100%; }
+  .student-preferences-page .student-summary { grid-template-columns:1fr 1fr; }
+  .student-preferences-page .student-summary-item { padding:.65rem .7rem; }
+  .student-preferences-page .summary-value { font-size:.84rem; }
+  .student-preferences-page .how-it-works { grid-template-columns:1fr; }
+  .student-preferences-page .card-header { padding:1rem !important; }
+  .student-preferences-page .card-body { padding:1rem !important; }
+}

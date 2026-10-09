@@ -1,0 +1,267 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/chairman-students.css">
+
+<main class="container-fluid chairman-students-page py-4 py-lg-5 px-3 px-md-4">
+    
+    <!-- Page Header -->
+    <header class="students-page-header d-flex flex-column flex-xl-row justify-content-between align-items-xl-end gap-4 mb-4 mb-lg-5">
+        <div class="students-heading-block">
+            <div class="students-eyebrow"><span class="students-eyebrow-mark"></span> CHAIRMAN WORKSPACE <span class="students-eyebrow-divider">/</span> ROSTER MANAGEMENT</div>
+            <h1 class="students-page-title">Student <span>Roster</span></h1>
+            <p class="students-page-subtitle">Review registration status, track supervisor assignments, and manage the department roster.</p>
+        </div>
+        <div class="students-header-actions d-flex flex-wrap gap-2 d-print-none">
+            <button type="button" onclick="window.print()" class="btn students-btn students-btn-quiet btn-action">
+                <i class="bi bi-printer me-2"></i>Export / Print
+            </button>
+            <button type="button" class="btn students-btn students-btn-outline btn-action" data-bs-toggle="modal" data-bs-target="#bulkUploadModal">
+                <i class="bi bi-file-earmark-arrow-up me-2"></i>Bulk upload
+            </button>
+            <button type="button" class="btn students-btn students-btn-primary btn-action" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                <i class="bi bi-plus-lg me-2"></i>Add student
+            </button>
+        </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <section class="students-filter-panel mb-4 d-print-none" aria-label="Filter student roster">
+        <div class="students-panel-heading">
+            <div class="students-panel-icon"><i class="bi bi-sliders2"></i></div>
+            <div><h2>Find students</h2><p>Narrow the roster by identity, session, allocation, or supervisor.</p></div>
+        </div>
+        <form method="GET" action="/chairman/students" class="students-filter-grid m-0">
+            <div class="students-filter-field students-search-field">
+                <label for="students-search">Search roster</label>
+                <div class="students-search-control"><i class="bi bi-search"></i>
+                    <input id="students-search" type="text" name="search" class="form-control" placeholder="Name, student ID, or email" value="<%= filters.search %>">
+                </div>
+            </div>
+            <div class="students-filter-field">
+                <label for="students-session">Academic session</label>
+                <select id="students-session" name="session_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Sessions</option>
+                    <% sessions.forEach(session => { %>
+                        <option value="<%= session.id %>" <%= filters.sessionId == session.id ? 'selected' : '' %>><%= session.session_name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="students-filter-field">
+                <label for="students-allocation">Allocation status</label>
+                <select id="students-allocation" name="allocation_status" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Allocations</option>
+                    <option value="allocated" <%= filters.allocationStatus === 'allocated' ? 'selected' : '' %>>Allocated Only</option>
+                    <option value="unallocated" <%= filters.allocationStatus === 'unallocated' ? 'selected' : '' %>>Unallocated Only</option>
+                </select>
+            </div>
+            <div class="students-filter-field">
+                <label for="students-supervisor">Supervisor</label>
+                <select id="students-supervisor" name="supervisor_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Supervisors</option>
+                    <% supervisors.forEach(sup => { %>
+                        <option value="<%= sup.id %>" <%= filters.supervisorId == sup.id ? 'selected' : '' %>><%= sup.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="students-filter-actions">
+                <button type="submit" class="btn students-btn students-btn-primary">Apply filters</button>
+                <a href="/chairman/students" class="btn students-btn students-btn-quiet" title="Clear filters"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset</a>
+            </div>
+        </form>
+    </section>
+
+    <!-- Student roster -->
+    <section class="students-roster-panel">
+        <div class="students-roster-heading">
+            <div><div class="students-section-kicker">DIRECTORY</div><h2>Enrolled students</h2><p>Student identity, academic standing, and allocation at a glance.</p></div>
+            <div class="students-roster-count"><span class="count-dot"></span><strong><%= students ? students.length : 0 %></strong><span>shown</span></div>
+        </div>
+        <div class="table-responsive students-table-wrap">
+            <% if (students && students.length > 0) { %>
+                <table class="table students-table">
+                    <thead>
+                        <tr>
+                            <th>Student Profile</th>
+                            <th>Academic Session</th>
+                            <th>Allocation / Supervisor</th>
+                            <th class="text-end d-print-none">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% students.forEach(student => { %>
+                            <tr>
+                                <td>
+                                    <div class="students-identity">
+                                        <span class="students-avatar"><i class="bi bi-person"></i></span>
+                                        <div class="students-identity-copy"><div class="students-name"><%= student.name %></div>
+                                            <div class="students-id">ID <span><%= student.student_id %></span></div>
+                                            <div class="students-email"><i class="bi bi-envelope me-1"></i><%= student.email %></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="students-session-tag"><i class="bi bi-calendar3 me-1"></i><%= student.session_name %></span>
+                                    <div class="small text-muted mt-1">
+                                        <% if (student.registration_status === 'approved') { %>
+                                            <span class="students-status students-status-approved"><i class="bi bi-check-circle-fill me-1 d-print-none"></i>Approved</span>
+                                        <% } else if (student.registration_status === 'pending') { %>
+                                            <span class="students-status students-status-pending"><i class="bi bi-hourglass-split me-1 d-print-none"></i>Pending review</span>
+                                        <% } else { %>
+                                            <span class="students-status students-status-rejected"><i class="bi bi-x-circle-fill me-1 d-print-none"></i>Rejected</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if (student.allocated_supervisor_name) { %>
+                                        <div class="students-supervisor-name"><i class="bi bi-person-workspace me-2 d-print-none"></i><%= student.allocated_supervisor_name %></div>
+                                        <div class="students-allocation-state"><span></span>Supervisor assigned</div>
+                                    <% } else if (student.registration_status === 'approved') { %>
+                                        <span class="students-unallocated"><i class="bi bi-exclamation-circle me-1"></i>Unallocated</span>
+                                    <% } else { %>
+                                        <span class="text-muted small fst-italic">—</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-end d-print-none">
+                                    <% if (student.registration_status === 'approved') { %>
+                                        <button class="btn students-assign-btn btn-action me-1" data-bs-toggle="modal" data-bs-target="#manualAssignModal-<%= student.id %>">
+                                            <% if (student.allocated_supervisor_name) { %>Re-assign<% } else { %>Manual Assign<% } %>
+                                        </button>
+
+                                        <!-- Manual Assign Modal -->
+                                        <div class="modal fade chairman-students-modal text-start" id="manualAssignModal-<%= student.id %>" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                                                        <h5 class="fw-bold text-dark mb-0"><% if (student.allocated_supervisor_name) { %>Re-assign Supervisor<% } else { %>Manual Supervisor Override<% } %></h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form action="/chairman/allocation/manual" method="POST">
+                                                        <div class="modal-body p-4">
+                                                            <div class="alert alert-warning border-0 rounded-3 small">
+                                                                <i class="bi bi-exclamation-triangle-fill me-1"></i> <strong>Warning:</strong> Use this only for late registrations or manual corrections. The master allocation run for this session must already be LOCKED before you can manually assign.
+                                                            </div>
+                                                            <input type="hidden" name="student_profile_id" value="<%= student.id %>">
+                                                            <input type="hidden" name="session_id" value="<%= student.session_id %>">
+                                                            
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold text-secondary small text-uppercase">Assign to Supervisor</label>
+                                                                <select name="supervisor_profile_id" class="form-select bg-light border-0" required>
+                                                                    <option value="">-- Choose Faculty --</option>
+                                                                    <% if (typeof supervisors !== 'undefined' && supervisors.length > 0) { %>
+                                                                        <% supervisors.forEach(sup => { %>
+                                                                            <% let isFull = sup.assigned_count >= sup.capacity; %>
+                                                                            <option value="<%= sup.id %>" <%= isFull && sup.id !== student.allocated_supervisor_id ? 'disabled' : '' %> <%= sup.id === student.allocated_supervisor_id ? 'selected' : '' %>>
+                                                                                <%= sup.name %> (Load: <%= sup.assigned_count %>/<%= sup.capacity %>) <%= isFull ? ' [FULL]' : '' %>
+                                                                           </option>
+                                                                        <% }) %>
+                                                                    <% } else { %>
+                                                                        <option value="" disabled>No faculty available.</option>
+                                                                    <% } %>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                                                            <button type="submit" class="btn btn-primary w-100 btn-action py-2">Confirm Assignment</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="text-muted small fst-italic">Requires Approval</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <div class="students-empty-state">
+                    <div class="students-empty-icon"><i class="bi bi-search"></i></div>
+                    <h3>No students match these filters</h3>
+                    <p>Try a different search term or reset the filters to return to the full roster.</p>
+                    <a href="/chairman/students" class="btn students-btn students-btn-outline mt-2 d-print-none">Reset filters</a>
+                </div>
+            <% } %>
+        </div>
+    </section>
+</main>
+
+<!-- Add Student Modal -->
+<div class="modal fade chairman-students-modal d-print-none" id="addStudentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold text-dark mb-0">Register Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/chairman/students/create" method="POST">
+                <div class="modal-body p-4">
+                    <div class="alert alert-info border-0 rounded-3 small">
+                        Manual entries bypass the registration approval queue and become active immediately.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Full Name</label>
+                        <input type="text" name="name" class="form-control bg-light border-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Email Address</label>
+                        <input type="email" name="email" class="form-control bg-light border-0" autocomplete="new-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Student ID / Roll No</label>
+                        <input type="text" name="student_id" class="form-control bg-light border-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Academic Session</label>
+                        <select name="session_id" class="form-select bg-light border-0" required>
+                            <% if (typeof sessions !== 'undefined') { %>
+                                <% sessions.forEach(session => { %><option value="<%= session.id %>"><%= session.session_name %></option><% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                    <button type="submit" class="btn students-btn students-btn-primary w-100 btn-action py-2">Create student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Upload Modal -->
+<div class="modal fade chairman-students-modal d-print-none" id="bulkUploadModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="fw-bold text-dark mb-0">Bulk Upload Roster</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/chairman/students/bulk-upload" method="POST" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    <div class="alert alert-primary border-0 rounded-3 small">
+                        <strong>Required CSV columns</strong><p class="mb-2 mt-1">Keep these headers in the first row of your file:</p>
+                        <code>id</code>, <code>name</code>, <code>mail</code>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Target Session</label>
+                        <select name="session_id" class="form-select bg-light border-0" required>
+                            <% if (typeof sessions !== 'undefined') { %>
+                                <% sessions.forEach(session => { %><option value="<%= session.id %>"><%= session.session_name %></option><% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">CSV File</label>
+                        <input type="file" name="studentCsv" class="form-control bg-light border-0" accept=".csv" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                    <button type="submit" class="btn students-btn students-btn-primary w-100 btn-action py-2"><i class="bi bi-upload"></i> Upload roster</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

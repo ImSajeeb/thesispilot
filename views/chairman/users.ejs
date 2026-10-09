@@ -1,0 +1,121 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="/css/chairman-users.css">
+
+<main class="chairman-users-page">
+  <section class="users-heading">
+    <div class="users-heading-copy">
+      <div class="users-eyebrow"><span class="eyebrow-line"></span> DEPARTMENT ADMINISTRATION</div>
+      <h1>Manage Users</h1>
+      <p>Create individual accounts, import users in bulk, and review registered department users.</p>
+    </div>
+    <a href="/chairman/dashboard" class="users-back-link"><i class="bi bi-arrow-left"></i><span>Dashboard</span></a>
+  </section>
+
+  <section class="users-overview" aria-label="User overview">
+    <article class="overview-card overview-total">
+      <div class="overview-icon"><i class="bi bi-people"></i></div>
+      <div><span class="overview-label">Registered users</span><strong><%= users.length %></strong><small>Across all available roles</small></div>
+    </article>
+    <article class="overview-card">
+      <div class="overview-icon"><i class="bi bi-mortarboard"></i></div>
+      <div><span class="overview-label">Students</span><strong><%= users.filter(u => u.role === 'student').length %></strong><small>Student accounts</small></div>
+    </article>
+    <article class="overview-card">
+      <div class="overview-icon"><i class="bi bi-person-workspace"></i></div>
+      <div><span class="overview-label">Supervisors</span><strong><%= users.filter(u => u.role === 'supervisor').length %></strong><small>Faculty accounts</small></div>
+    </article>
+  </section>
+
+  <section class="users-workspace">
+    <aside class="users-forms-column">
+      <article class="users-panel create-panel">
+        <header class="panel-heading">
+          <div class="panel-heading-icon"><i class="bi bi-person-plus"></i></div>
+          <div><h2>Create a user</h2><p>Add one account using university details.</p></div>
+        </header>
+        <form action="/chairman/users/create" method="POST" class="users-form">
+          <div class="field-group">
+            <label for="user-name">Full name <span>*</span></label>
+            <input id="user-name" type="text" class="form-control" name="name" required placeholder="Enter full name" autocomplete="name">
+          </div>
+          <div class="field-group">
+            <label for="user-university-id">University ID / Roll</label>
+            <input id="user-university-id" type="text" class="form-control" name="university_id" placeholder="e.g. 1902043">
+            <small>Optional for teachers.</small>
+          </div>
+          <div class="field-group">
+            <label for="user-email">University email <span>*</span></label>
+            <input id="user-email" type="email" class="form-control" name="email" required placeholder="name@university.edu" autocomplete="email">
+          </div>
+          <div class="field-group">
+            <label for="user-role">Account role <span>*</span></label>
+            <select id="user-role" class="form-select" name="role" required>
+              <option value="student">Student</option>
+              <option value="supervisor">Supervisor</option>
+            </select>
+          </div>
+          <button type="submit" class="users-primary-button"><i class="bi bi-plus-lg"></i> Create user account</button>
+        </form>
+      </article>
+
+      <article class="users-panel bulk-panel">
+        <header class="panel-heading">
+          <div class="panel-heading-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+          <div><h2>Import users</h2><p>Register multiple accounts from a CSV file.</p></div>
+        </header>
+        <form action="/chairman/users/bulk-upload" method="POST" enctype="multipart/form-data" class="users-form">
+          <div class="field-group">
+            <label for="users-csv">CSV file <span>*</span></label>
+            <input id="users-csv" type="file" class="form-control file-control" name="file" accept=".csv" required>
+          </div>
+          <div class="csv-guidance">
+            <div class="csv-guidance-title"><i class="bi bi-info-circle"></i> Required CSV structure</div>
+            <code>name, university_id, email, role</code>
+            <p>Use <strong>student</strong> or <strong>supervisor</strong> for the role value. Ensure the first row contains these headers.</p>
+          </div>
+          <button type="submit" class="users-secondary-button"><i class="bi bi-upload"></i> Upload CSV</button>
+        </form>
+      </article>
+    </aside>
+
+    <section class="users-panel directory-panel">
+      <header class="directory-heading">
+        <div>
+          <div class="section-kicker">USER DIRECTORY</div>
+          <h2>Registered accounts</h2>
+          <p>Review the identity and role of each registered user.</p>
+        </div>
+        <span class="directory-count"><i class="bi bi-person-lines-fill"></i> <%= users.length %> users</span>
+      </header>
+      <% if (users.length === 0) { %>
+        <div class="users-empty-state">
+          <div class="empty-state-icon"><i class="bi bi-people"></i></div>
+          <h3>No users registered yet</h3>
+          <p>Create an individual account or import a CSV file to populate the directory.</p>
+        </div>
+      <% } else { %>
+        <div class="users-table-wrap">
+          <table class="table users-table">
+            <thead><tr><th>User</th><th>University ID</th><th>Role</th></tr></thead>
+            <tbody>
+              <% users.forEach(u => { %>
+                <tr>
+                  <td>
+                    <div class="directory-user">
+                      <span class="user-avatar"><%= (u.name || '?').trim().charAt(0).toUpperCase() %></span>
+                      <div class="user-identity"><strong><%= u.name %></strong><span><%= u.email %></span></div>
+                    </div>
+                  </td>
+                  <td><span class="university-id"><%= u.university_id || '—' %></span></td>
+                  <td><span class="role-pill <%= u.role === 'supervisor' ? 'role-supervisor' : 'role-student' %>"><span></span><%= u.role.toUpperCase() %></span></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <footer class="directory-footer"><i class="bi bi-shield-check"></i> User records are displayed from the current department directory.</footer>
+      <% } %>
+    </section>
+  </section>
+</main>
+<%- include('../partials/footer') %>

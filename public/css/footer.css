@@ -1,0 +1,101 @@
+/* ThesisPilot shared footer — scoped styles only */
+.tp-footer.tp-footer--refined {
+    position: relative;
+    margin-top: auto;
+    padding: 1.15rem clamp(1rem, 3vw, 2rem);
+    background: rgba(17, 17, 17, 0.96);
+    border-top: 1px solid rgba(234, 88, 12, 0.24);
+    color: var(--text-muted, #a3a3a3);
+}
+
+.tp-footer.tp-footer--refined::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: clamp(1rem, 3vw, 2rem);
+    width: 64px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--primary-color, #ea580c);
+}
+
+.tp-footer__inner {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+}
+
+.tp-footer__brandline {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+}
+
+.tp-footer__mark {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(234, 88, 12, 0.3);
+    border-radius: 11px;
+    background: rgba(234, 88, 12, 0.09);
+    color: var(--primary-light, #f97316);
+    font-size: 1.05rem;
+}
+
+.tp-footer__copy { min-width: 0; }
+
+.tp-footer__copyright {
+    color: var(--text-muted, #a3a3a3);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.tp-footer__copyright strong {
+    color: var(--heading-color, #fff);
+    font-weight: 700;
+}
+
+.tp-footer__description {
+    margin-top: 0.12rem;
+    color: var(--text-muted, #a3a3a3);
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.tp-footer__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color, #2d2d2d);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--text-muted, #a3a3a3);
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tp-footer__status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--primary-light, #f97316);
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+}
+
+@media (max-width: 575.98px) {
+    .tp-footer.tp-footer--refined { padding: 1rem; }
+    .tp-footer__inner { align-items: flex-start; flex-direction: column; gap: 0.85rem; }
+    .tp-footer__mark { flex-basis: 34px; width: 34px; height: 34px; border-radius: 9px; }
+    .tp-footer__status { margin-left: 2.8rem; }
+}

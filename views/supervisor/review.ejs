@@ -1,0 +1,184 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/supervisor-review.css">
+<main class="supervisor-review-page">
+<div class="review-shell">
+    
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <div class="review-eyebrow">SUPERVISOR WORKSPACE <span></span> THESIS REVIEW</div>
+            <h2 class="fw-bolder text-dark mb-1 review-page-title">Review Thesis Submission</h2>
+            <p class="text-secondary mb-0">Evaluate student submission documents and provide formal feedback.</p>
+        </div>
+        <div>
+            <a href="/supervisor/dashboard" class="btn btn-light fw-semibold text-secondary btn-action border shadow-sm bg-white">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <% if (typeof errorMsg !== 'undefined' && errorMsg.length > 0) { %>
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4"><%= errorMsg %></div>
+    <% } %>
+
+    <!-- Thesis Information Card -->
+    <div class="card premium-card review-record-card border mb-4">
+        <div class="card-header bg-transparent border-bottom pt-4 pb-3 px-4 d-flex justify-content-between align-items-center bg-light">
+            <h5 class="fw-bolder text-dark mb-0"><i class="bi bi-file-earmark-text text-primary me-2"></i> Submission Details</h5>
+            <% 
+                let badgeClass = 'badge-submitted';
+                if (thesis.status === 'completed' || thesis.status === 'proposal_approved') badgeClass = 'badge-completed';
+                else if (thesis.status === 'revision_required' || thesis.status === 'under_review') badgeClass = 'badge-review';
+            %>
+            <span class="badge-status <%= badgeClass %>"><%= thesis.status.replace(/_/g, ' ').toUpperCase() %></span>
+        </div>
+        <div class="card-body p-4">
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Student Name</span>
+                    <h5 class="fw-bold text-dark mb-0"><%= thesis.student_name %></h5>
+                </div>
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Student ID</span>
+                    <h5 class="fw-bold text-dark font-monospace mb-0"><%= thesis.student_code %></h5>
+                </div>
+            </div>
+
+            <hr class="text-muted opacity-25">
+
+            <div class="mb-4 mt-4">
+                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Thesis Title</span>
+                <h3 class="fw-bolder text-dark"><%= thesis.title %></h3>
+            </div>
+
+            <div class="mb-4">
+                <span class="text-secondary small fw-bold text-uppercase mb-2 d-block">Abstract</span>
+                <div class="bg-light p-4 rounded-3 border text-secondary" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;"><%= thesis.abstract %></div>
+            </div>
+
+            <div class="row g-3">
+                <% if (thesis.proposal_file) { %>
+                    <div class="col-md-6">
+                        <a href="<%= thesis.proposal_file %>" target="_blank" class="btn btn-outline-primary w-100 py-3 fw-semibold text-start px-4 shadow-sm bg-white d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-file-earmark-pdf-fill text-danger me-2 fs-5"></i> View Proposal Document</span>
+                            <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </div>
+                <% } %>
+
+                <% if (thesis.final_file) { %>
+                    <div class="col-md-6">
+                        <a href="<%= thesis.final_file %>" target="_blank" class="btn btn-outline-success w-100 py-3 fw-semibold text-start px-4 shadow-sm bg-white d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-award-fill text-success me-2 fs-5"></i> View Final Thesis Document</span>
+                            <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+
+            <% if (thesis.final_grade) { %>
+                <hr class="text-muted opacity-25 my-4">
+                <div class="p-4 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-4 text-center">
+                    <h4 class="text-success fw-bold mb-1"><i class="bi bi-trophy-fill text-warning me-2"></i> Thesis Completed</h4>
+                    <p class="text-secondary small mb-2">Final Evaluation Grade:</p>
+                    <span class="badge bg-success fs-3 px-4 py-2 shadow-sm"><%= thesis.final_grade %></span>
+                </div>
+            <% } %>
+
+        </div>
+    </div>
+
+    <!-- PHASE 1: PROPOSAL REVIEW FORM -->
+    <% if (['proposal_submitted', 'under_review', 'revision_required', 'proposal_approved'].includes(thesis.status)) { %>
+        <div class="card premium-card review-action-card proposal-review-card">
+            <div class="card-body p-4 p-md-5">
+                <div class="review-section-kicker">PHASE 01</div>
+                <h4 class="fw-bolder text-dark mb-2">Proposal Review &amp; Decision</h4>
+                <p class="text-secondary small mb-4">Provide feedback, attach files, and update the proposal status. You can modify this until the final thesis is submitted.</p>
+                
+                <!-- Added enctype for file uploads -->
+                <form action="/supervisor/thesis/<%= thesis.id %>/review" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase mb-3">Review Decision</label>
+                        <div class="d-flex flex-column flex-sm-row gap-3">
+                            <input type="radio" class="btn-check" name="decision" id="decUnderReview" value="under_review" required <%= thesis.status === 'under_review' || thesis.status === 'proposal_submitted' ? 'checked' : '' %>>
+                            <label class="btn btn-outline-info fw-bold py-2 flex-grow-1 shadow-sm" for="decUnderReview">
+                                <i class="bi bi-search me-1"></i> Under Review
+                            </label>
+
+                            <input type="radio" class="btn-check" name="decision" id="decRevision" value="revision" required <%= thesis.status === 'revision_required' ? 'checked' : '' %>>
+                            <label class="btn btn-outline-warning text-dark fw-bold py-2 flex-grow-1 shadow-sm" for="decRevision">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Request Revision
+                            </label>
+
+                            <input type="radio" class="btn-check" name="decision" id="decApprove" value="approve" required <%= thesis.status === 'proposal_approved' ? 'checked' : '' %>>
+                            <label class="btn btn-outline-success fw-bold py-2 flex-grow-1 shadow-sm" for="decApprove">
+                                <i class="bi bi-check-circle-fill me-1"></i> Approve Proposal
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Supervisor Feedback / Revision Notes</label>
+                        <textarea class="form-control bg-light border-0 p-3 shadow-sm" name="feedback" rows="4" placeholder="Provide constructive feedback (required if requesting a revision)..."><%= thesis.supervisor_feedback || '' %></textarea>
+                    </div>
+
+                    <!-- File Upload Section -->
+                    <div class="mb-4 p-4 rounded-3 border bg-light shadow-sm">
+                        <label class="form-label fw-bold text-dark d-block">Attach Feedback File (Optional)</label>
+                        <p class="text-secondary small mb-3">Upload annotated notes or reference materials to help the student.</p>
+                        <input type="file" name="feedback_file" class="form-control border-0 bg-white shadow-sm" accept=".pdf,.doc,.docx,.zip">
+                        
+                        <% if (typeof thesis.supervisor_feedback_file !== 'undefined' && thesis.supervisor_feedback_file) { %>
+                            <div class="mt-3 p-3 bg-white border rounded d-flex align-items-center justify-content-between shadow-sm">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary me-3">Current File</span>
+                                    <span class="small fw-semibold text-secondary text-truncate" style="max-width: 250px;"><%= thesis.supervisor_feedback_file.split('/').pop() %></span>
+                                </div>
+                                <a href="<%= thesis.supervisor_feedback_file %>" target="_blank" class="btn btn-sm btn-outline-primary fw-bold">
+                                    <i class="bi bi-download me-1"></i> View File
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-action w-100 shadow py-3 fs-6" onclick="return confirm('Submit this review and update the student?');">
+                        <i class="bi bi-save-fill me-2"></i> Save Review & Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- PHASE 2: FINAL THESIS GRADING FORM -->
+    <% if (thesis.status === 'final_submitted' || thesis.status === 'under_evaluation') { %>
+        <div class="card premium-card review-action-card final-evaluation-card">
+            <div class="card-body p-4 p-md-5">
+                <div class="review-section-kicker">PHASE 02</div>
+                <h4 class="fw-bolder text-dark mb-2"><i class="bi bi-award me-2"></i>Final Thesis Evaluation</h4>
+                <p class="text-secondary small mb-4">Assign a final grade to complete the thesis lifecycle.</p>
+                
+                <form action="/supervisor/thesis/<%= thesis.id %>/evaluate" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Final Grade / Mark</label>
+                        <input type="text" class="form-control form-control-lg bg-light border-0 shadow-sm" name="final_grade" required placeholder="e.g. A+, 95/100, Passed">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Final Evaluation Comments (Optional)</label>
+                        <textarea class="form-control bg-light border-0 p-3 shadow-sm" name="feedback" rows="3" placeholder="Final comments for the student's record..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-action w-100 py-3 shadow fs-6" onclick="return confirm('Submit final grade? This will permanently mark the thesis as Completed.');">
+                        <i class="bi bi-check-circle-fill me-2"></i> Submit Grade & Mark Completed
+                    </button>
+                </form>
+            </div>
+        </div>
+    <% } %>
+
+</div>
+</main>
+
+<%- include('../partials/footer') %>

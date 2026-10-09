@@ -1,0 +1,49 @@
+/* Navbar */
+.tp-navbar {
+    background: rgba(17, 17, 17, 0.85);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* Branding */
+.tp-brand {
+    color: var(--heading-color) !important;
+    font-weight: 800;
+    font-size: 1.5rem;
+    transition: color 0.2s ease;
+}
+
+.tp-brand:hover {
+    color: var(--primary-light) !important;
+}
+
+.tp-brand-icon {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: #ffffff;
+    font-size: 1.25rem;
+}
+
+/* Footer */
+.tp-footer {
+    background-color: transparent;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Layout Utilities */
+.tp-main-content {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+/* Auth Wrapper for centering */
+.tp-auth-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

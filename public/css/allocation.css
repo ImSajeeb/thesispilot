@@ -1,0 +1,424 @@
+/* ThesisPilot Allocation Center — restrained Onyx–Copper styling.
+   The original EJS workflow and Bootstrap layout are intentionally preserved. */
+
+body:has(.allocation-page) {
+  background: #111111;
+}
+
+.allocation-page {
+  --alloc-surface: #1c1c1c;
+  --alloc-surface-raised: #242424;
+  --alloc-border: #383838;
+  --alloc-text: #ededed;
+  --alloc-muted: #a7a7a7;
+  --alloc-copper: #f97316;
+  --alloc-copper-light: #ffb17c;
+  --alloc-green: #ffb17c;
+  --alloc-red: #ffaaaa;
+  max-width: 1400px;
+  color: var(--alloc-text);
+}
+
+.allocation-page .text-dark { color: var(--alloc-text) !important; }
+.allocation-page .text-secondary,
+.allocation-page .text-muted { color: var(--alloc-muted) !important; }
+.allocation-page .text-primary { color: var(--alloc-copper-light) !important; }
+.allocation-page .text-success { color: var(--alloc-copper-light) !important; }
+.allocation-page .text-danger { color: var(--alloc-red) !important; }
+.allocation-page .text-warning { color: #ffd08a !important; }
+.allocation-page .text-info { color: #9bdff4 !important; }
+
+.allocation-page .wizard-card {
+  background: var(--alloc-surface);
+  color: var(--alloc-text);
+  border: 1px solid var(--alloc-border);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.16);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.allocation-page .card,
+.allocation-page .card-header,
+.allocation-page .card-body {
+  color: var(--alloc-text);
+}
+
+.allocation-page .bg-light,
+.allocation-page .bg-white {
+  background-color: var(--alloc-surface-raised) !important;
+}
+.allocation-page .border,
+.allocation-page .border-top,
+.allocation-page .border-bottom,
+.allocation-page .border-start {
+  border-color: var(--alloc-border) !important;
+}
+
+.allocation-page .form-control,
+.allocation-page .form-select {
+  color: var(--alloc-text) !important;
+  background-color: #151515 !important;
+  border: 1px solid #414141 !important;
+  border-radius: 9px;
+}
+.allocation-page .form-control::placeholder { color: #888; }
+.allocation-page .form-control:focus,
+.allocation-page .form-select:focus {
+  border-color: var(--alloc-copper) !important;
+  box-shadow: 0 0 0 .2rem rgba(249,115,22,.16) !important;
+}
+.allocation-page .form-check-input {
+  background-color: #2d2d2d;
+  border-color: #606060;
+}
+.allocation-page .form-check-input:checked {
+  background-color: var(--alloc-copper);
+  border-color: var(--alloc-copper);
+}
+.allocation-page .form-check-input:focus {
+  border-color: var(--alloc-copper);
+  box-shadow: 0 0 0 .2rem rgba(249,115,22,.16);
+}
+
+.allocation-page .btn-primary,
+.allocation-page .btn-warning,
+.allocation-page .btn-success {
+  background: linear-gradient(135deg, #fb923c, #ea580c) !important;
+  border-color: #f97316 !important;
+  color: #17110d !important;
+  font-weight: 700;
+}
+.allocation-page .btn-primary:hover,
+.allocation-page .btn-warning:hover,
+.allocation-page .btn-success:hover {
+  filter: brightness(1.07);
+}
+.allocation-page .btn-outline-primary,
+.allocation-page .btn-outline-dark,
+.allocation-page .btn-light {
+  background: #292929 !important;
+  color: var(--alloc-text) !important;
+  border-color: #4a4a4a !important;
+}
+.allocation-page .btn-dark {
+  background: #090909 !important;
+  border-color: #555 !important;
+  color: #fff !important;
+}
+.allocation-page .btn-action {
+  border-radius: 9px;
+  padding: .6rem 1.15rem;
+  font-weight: 700;
+  transition: transform .18s ease, filter .18s ease;
+}
+.allocation-page .btn-action:hover { transform: translateY(-1px); }
+
+.allocation-page .stepper-wrapper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: .5rem 0 2rem;
+  padding: 0 .5rem;
+}
+.allocation-page .stepper-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 19px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #414141;
+  z-index: 1;
+}
+.allocation-page .stepper-progress {
+  position: absolute;
+  top: 19px;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ea580c, #ffb17c);
+  z-index: 2;
+  transition: width .4s ease;
+}
+.allocation-page .step-item {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 25%;
+}
+.allocation-page .step-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #303030;
+  color: #b0b0b0;
+  border: 4px solid var(--alloc-surface);
+  font-weight: 700;
+  font-size: 1rem;
+}
+.allocation-page .step-label {
+  margin-top: .65rem;
+  color: var(--alloc-muted);
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  text-align: center;
+}
+.allocation-page .step-item.completed .step-icon {
+  background: #57351f;
+  color: #ffd0aa;
+}
+.allocation-page .step-item.completed .step-label { color: var(--alloc-copper-light); }
+.allocation-page .step-item.active .step-icon {
+  background: var(--alloc-copper);
+  color: #1a110b;
+  box-shadow: 0 0 0 4px rgba(249,115,22,.14);
+}
+.allocation-page .step-item.active .step-label { color: var(--alloc-copper-light); }
+
+.allocation-page .strategy-card {
+  display: block;
+  position: relative;
+  height: 100%;
+  cursor: pointer;
+}
+.allocation-page .strategy-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.allocation-page .strategy-card .card-body {
+  height: 100%;
+  padding: 1.35rem;
+  background: var(--alloc-surface-raised);
+  border: 1px solid var(--alloc-border);
+  border-radius: 14px;
+  transition: border-color .18s ease, background .18s ease;
+}
+.allocation-page .strategy-card:hover .card-body {
+  border-color: #925126;
+}
+.allocation-page .strategy-card input[type="radio"]:checked + .card-body {
+  border: 2px solid var(--alloc-copper);
+  background: rgba(249,115,22,.08);
+}
+.allocation-page .strategy-card input[type="radio"]:focus-visible + .card-body {
+  outline: 2px solid var(--alloc-copper-light);
+  outline-offset: 3px;
+}
+.allocation-page .strategy-card input[type="radio"]:checked + .card-body .strategy-icon {
+  color: var(--alloc-copper-light) !important;
+}
+
+.allocation-page .table-responsive {
+  border-radius: 0 0 16px 16px;
+}
+.allocation-page .table-custom {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--alloc-text);
+  --bs-table-border-color: var(--alloc-border);
+  margin-bottom: 0;
+}
+.allocation-page .table-custom thead th {
+  background: #252525;
+  color: #bcbcbc;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: .95rem 1.2rem;
+  border-bottom: 1px solid var(--alloc-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.allocation-page .table-custom tbody td {
+  padding: .9rem 1.2rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #303030;
+  color: var(--alloc-text);
+}
+.allocation-page .table-custom tbody tr:hover > * {
+  --bs-table-bg-state: rgba(255,255,255,.025);
+}
+.allocation-page .badge-soft-success,
+.allocation-page .badge-soft-primary,
+.allocation-page .badge-soft-danger,
+.allocation-page .badge-soft-info {
+  display: inline-block;
+  padding: .4em .75em;
+  border-radius: 7px;
+  font-size: .74rem;
+  font-weight: 700;
+}
+.allocation-page .badge-soft-success {
+  color: #ffbf91;
+  background: rgba(249,115,22,.12);
+  border: 1px solid rgba(249,115,22,.28);
+}
+.allocation-page .badge-soft-primary {
+  color: #d5c8ff;
+  background: rgba(128,91,220,.15);
+}
+.allocation-page .badge-soft-danger {
+  color: #ffbaba;
+  background: rgba(220,70,55,.13);
+  border: 1px solid rgba(220,90,75,.2);
+}
+.allocation-page .badge-soft-info {
+  color: #b5e8f6;
+  background: rgba(50,160,190,.14);
+}
+.allocation-page .row-assigned > * { background-color: rgba(249,115,22,.045) !important; }
+.allocation-page .row-unassigned > * { background-color: rgba(220,75,65,.055) !important; }
+
+.allocation-page .alert {
+  background: #25221d;
+  color: #f0dfc9;
+  border-color: #66503a !important;
+}
+.allocation-page .alert-success {
+  background: #2a211b;
+  color: #ffcfad;
+  border-color: #754522 !important;
+}
+.allocation-page .alert .text-dark { color: inherit !important; }
+
+@media (max-width: 767.98px) {
+  .allocation-page { padding-left: .85rem !important; padding-right: .85rem !important; }
+  .allocation-page .wizard-card { border-radius: 14px; }
+  .allocation-page .stepper-wrapper { padding: 0; }
+  .allocation-page .step-label { font-size: .62rem; letter-spacing: .025em; }
+  .allocation-page .table-custom thead th,
+  .allocation-page .table-custom tbody td { padding: .75rem .7rem; }
+  .allocation-page .stepper-wrapper::before,
+  .allocation-page .stepper-progress { top: 18px; }
+  .allocation-page .step-icon { width: 38px; height: 38px; }
+}
+
+@media print {
+  body:has(.allocation-page) { background: #fff !important; }
+  .allocation-page { max-width: 100% !important; color: #111 !important; padding: 0 !important; }
+  .allocation-page .d-print-none,
+  .navbar,
+  footer,
+  .allocation-page .stepper-wrapper,
+  .allocation-page .alert { display: none !important; }
+  .allocation-page .wizard-card {
+    box-shadow: none !important;
+    border: none !important;
+    background: #fff !important;
+    color: #111 !important;
+    margin: 0 !important;
+  }
+  .allocation-page .table-responsive { max-height: none !important; overflow: visible !important; }
+  .allocation-page .table-custom thead th,
+  .allocation-page .table-custom tbody td {
+    background: #fff !important;
+    color: #111 !important;
+    padding: .5rem !important;
+    border: 1px solid #ccc !important;
+  }
+  .allocation-page .badge-soft-success,
+  .allocation-page .badge-soft-info,
+  .allocation-page .badge-soft-danger {
+    background: transparent !important;
+    color: #111 !important;
+    border: 1px solid #777 !important;
+  }
+  .allocation-page .print-header::before {
+    content: "Official Thesis Allocation Roster";
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  @page { size: portrait; margin: 15mm; }
+}
+
+/* Generate Draft Preview — Onyx–Copper treatment */
+.allocation-page .allocation-preview-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, .11), transparent 58%),
+    linear-gradient(145deg, #202020 0%, #191919 58%, #1e1b19 100%) !important;
+  border: 1px solid rgba(249, 115, 22, .42) !important;
+  border-radius: 20px;
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, .22),
+    inset 0 1px 0 rgba(255, 177, 124, .06);
+}
+
+.allocation-page .allocation-preview-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 177, 124, .75), transparent);
+}
+
+.allocation-page .allocation-preview-card h4 {
+  color: #f5f5f5 !important;
+  letter-spacing: -.025em;
+}
+
+.allocation-page .allocation-preview-card p {
+  color: #b8b8b8 !important;
+  line-height: 1.75;
+}
+
+.allocation-page .allocation-preview-card p strong {
+  color: #ffd0aa;
+  font-weight: 750;
+}
+
+.allocation-page .allocation-preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  color: #ffb17c;
+  font-size: 1.55rem;
+  background: rgba(249, 115, 22, .11);
+  border: 1px solid rgba(249, 115, 22, .28);
+  box-shadow: 0 0 28px rgba(249, 115, 22, .08);
+}
+
+.allocation-page .allocation-preview-kicker {
+  color: #ffb17c;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.allocation-page .allocation-preview-card .btn-warning {
+  background: linear-gradient(135deg, #fb923c, #ea580c) !important;
+  color: #17110d !important;
+  border: 1px solid #f97316 !important;
+  box-shadow: 0 8px 22px rgba(234, 88, 12, .2) !important;
+}
+
+.allocation-page .allocation-preview-card .btn-warning:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 10px 26px rgba(234, 88, 12, .27) !important;
+}
+
+@media (max-width: 767.98px) {
+  .allocation-page .allocation-preview-card {
+    padding: 1.75rem !important;
+    border-radius: 16px;
+  }
+}

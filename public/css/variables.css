@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    color-scheme: dark;
+    
+    /* Core Brand Accents (Warm, Metallic, No Blue) */
+    --primary-color: #ea580c;      /* Rich Copper / Burnt Orange */
+    --primary-light: #f97316;      /* Bright Orange */
+    --secondary-color: #d97706;    /* Amber / Bronze */
+    
+    /* Onyx Backgrounds (True neutral grays, absolutely no blue tint) */
+    --bg-base: #111111;            /* Deep Onyx */
+    --surface-color: rgba(28, 28, 28, 0.85); /* Elevated Onyx for cards */
+    --border-color: #2d2d2d;       /* Neutral dark border */
+    
+    /* Typography */
+    --text-main: #ededed;          /* Warm off-white */
+    --text-muted: #a3a3a3;         /* Neutral gray */
+    --heading-color: #ffffff;
+    
+    /* Status */
+    --success: #16a34a;            /* Neutral Green */
+    --warning: #ca8a04;            /* Dark Yellow */
+    --danger: #dc2626;             /* Standard Red */
+
+    /* Modern Aesthetics */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --glass-blur: blur(16px);
+}

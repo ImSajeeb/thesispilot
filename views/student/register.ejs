@@ -1,0 +1,374 @@
+<%- include('../partials/header') %>
+
+<style>
+    /* Page-specific styles: kept inside this template as requested. */
+    .thesis-register-page {
+        --tr-bg: #111111;
+        --tr-panel: #191919;
+        --tr-panel-soft: #202020;
+        --tr-border: #343434;
+        --tr-text: #f2f2f2;
+        --tr-muted: #a6a6a6;
+        --tr-copper: #d98a55;
+        --tr-copper-bright: #efa36c;
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 2rem 1rem 3rem;
+        color: var(--tr-text);
+    }
+    .thesis-register-page .tr-topline {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin-bottom: .65rem;
+        color: var(--tr-copper);
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+    }
+    .thesis-register-page .tr-topline::before {
+        content: "";
+        display: inline-block;
+        width: 24px;
+        height: 2px;
+        background: var(--tr-copper);
+    }
+    .thesis-register-page .tr-heading {
+        color: var(--tr-text);
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: -.045em;
+        margin: 0 0 .5rem;
+    }
+    .thesis-register-page .tr-subtitle {
+        color: var(--tr-muted);
+        max-width: 650px;
+        line-height: 1.7;
+        margin: 0;
+    }
+    .thesis-register-page .tr-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        border: 1px solid var(--tr-border);
+        background: #1b1b1b;
+        color: #d0d0d0;
+        padding: .7rem 1rem;
+        border-radius: 10px;
+        font-weight: 650;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: border-color .2s ease, color .2s ease, background .2s ease;
+    }
+    .thesis-register-page .tr-cancel:hover {
+        border-color: var(--tr-copper);
+        color: var(--tr-copper-bright);
+        background: #24201d;
+    }
+    .thesis-register-page .tr-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 1.25rem;
+        margin-top: 2rem;
+        align-items: start;
+    }
+    .thesis-register-page .tr-card {
+        background: var(--tr-panel);
+        border: 1px solid var(--tr-border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 14px 35px rgba(0,0,0,.18);
+    }
+    .thesis-register-page .tr-card-head {
+        padding: 1.35rem 1.5rem;
+        border-bottom: 1px solid var(--tr-border);
+        background: linear-gradient(115deg, rgba(217,138,85,.09), transparent 70%);
+    }
+    .thesis-register-page .tr-card-head h2 {
+        color: var(--tr-text);
+        font-size: 1.05rem;
+        font-weight: 750;
+        margin: 0 0 .35rem;
+    }
+    .thesis-register-page .tr-card-head p {
+        color: var(--tr-muted);
+        font-size: .88rem;
+        margin: 0;
+        line-height: 1.6;
+    }
+    .thesis-register-page .tr-form-body { padding: 1.5rem; }
+    .thesis-register-page .tr-field { margin-bottom: 1.35rem; }
+    .thesis-register-page .tr-label {
+        display: block;
+        color: #e6e6e6;
+        font-size: .83rem;
+        font-weight: 750;
+        margin-bottom: .55rem;
+    }
+    .thesis-register-page .tr-label .tr-optional {
+        color: var(--tr-muted);
+        font-weight: 500;
+        margin-left: .35rem;
+    }
+    .thesis-register-page .form-control,
+    .thesis-register-page .form-select {
+        background-color: #121212;
+        color: var(--tr-text);
+        border: 1px solid #3a3a3a;
+        border-radius: 9px;
+        min-height: 46px;
+        padding: .7rem .85rem;
+        box-shadow: none;
+    }
+    .thesis-register-page textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+        line-height: 1.65;
+    }
+    .thesis-register-page .form-control::placeholder { color: #777; }
+    .thesis-register-page .form-control:focus,
+    .thesis-register-page .form-select:focus {
+        background-color: #151515;
+        color: #fff;
+        border-color: var(--tr-copper);
+        box-shadow: 0 0 0 .2rem rgba(217,138,85,.13);
+    }
+    .thesis-register-page .tr-help {
+        color: var(--tr-muted);
+        font-size: .78rem;
+        line-height: 1.6;
+        margin-top: .5rem;
+    }
+    .thesis-register-page .tr-supervisor-box {
+        background: #151515;
+        border: 1px solid var(--tr-border);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+    .thesis-register-page .tr-supervisor-title {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        color: var(--tr-text);
+        font-size: .86rem;
+        font-weight: 750;
+        margin-bottom: .5rem;
+    }
+    .thesis-register-page .tr-star { color: var(--tr-copper-bright); }
+    .thesis-register-page select[multiple] {
+        min-height: 150px;
+        padding: .4rem;
+    }
+    .thesis-register-page select[multiple] option {
+        padding: .6rem .65rem;
+        border-radius: 5px;
+    }
+    .thesis-register-page select[multiple] option:checked {
+        background: #70472f linear-gradient(0deg, #70472f 0%, #70472f 100%);
+        color: #fff;
+    }
+    .thesis-register-page .tr-submit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .65rem;
+        width: 100%;
+        border: 1px solid #e49a67;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #d98a55, #b96e3d);
+        color: #17110d;
+        padding: .9rem 1.2rem;
+        font-weight: 800;
+        box-shadow: 0 7px 18px rgba(185,110,61,.17);
+        transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+    }
+    .thesis-register-page .tr-submit:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(185,110,61,.22);
+    }
+    .thesis-register-page .tr-submit:focus-visible,
+    .thesis-register-page .tr-cancel:focus-visible {
+        outline: 2px solid var(--tr-copper-bright);
+        outline-offset: 3px;
+    }
+    .thesis-register-page .tr-aside {
+        padding: 1.25rem;
+    }
+    .thesis-register-page .tr-aside-kicker {
+        color: var(--tr-copper);
+        font-size: .7rem;
+        font-weight: 800;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+        margin-bottom: .7rem;
+    }
+    .thesis-register-page .tr-aside h3 {
+        color: var(--tr-text);
+        font-size: 1rem;
+        font-weight: 750;
+        margin-bottom: 1rem;
+    }
+    .thesis-register-page .tr-step {
+        display: flex;
+        align-items: flex-start;
+        gap: .75rem;
+        padding: .9rem 0;
+        border-top: 1px solid #303030;
+    }
+    .thesis-register-page .tr-step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        border: 1px solid rgba(217,138,85,.45);
+        border-radius: 8px;
+        background: rgba(217,138,85,.09);
+        color: var(--tr-copper-bright);
+        font-size: .75rem;
+        font-weight: 800;
+    }
+    .thesis-register-page .tr-step strong {
+        display: block;
+        color: #e7e7e7;
+        font-size: .82rem;
+        margin-bottom: .25rem;
+    }
+    .thesis-register-page .tr-step span {
+        display: block;
+        color: var(--tr-muted);
+        font-size: .77rem;
+        line-height: 1.55;
+    }
+    .thesis-register-page .tr-note {
+        margin-top: 1rem;
+        padding: .85rem;
+        border-radius: 10px;
+        border: 1px solid #3c3028;
+        background: rgba(217,138,85,.06);
+        color: #c5b5a8;
+        font-size: .78rem;
+        line-height: 1.6;
+    }
+    @media (max-width: 900px) {
+        .thesis-register-page .tr-layout { grid-template-columns: minmax(0, 1fr); }
+        .thesis-register-page .tr-aside { padding: 1.2rem 1.5rem; }
+    }
+    @media (max-width: 575px) {
+        .thesis-register-page { padding: 1.25rem .75rem 2rem; }
+        .thesis-register-page .tr-page-header { align-items: flex-start !important; }
+        .thesis-register-page .tr-cancel { padding: .6rem .75rem; font-size: .85rem; }
+        .thesis-register-page .tr-form-body,
+        .thesis-register-page .tr-card-head { padding: 1.1rem; }
+    }
+</style>
+
+<main class="thesis-register-page">
+    <div class="tr-page-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+        <div>
+            <div class="tr-topline">Student workspace</div>
+            <h1 class="tr-heading">Register Thesis</h1>
+            <p class="tr-subtitle">Introduce your proposed research topic, summarize the work, and share your supervisor preferences to begin the thesis registration process.</p>
+        </div>
+        <a href="/student/dashboard" class="tr-cancel">
+            <i class="bi bi-arrow-left"></i> Back to dashboard
+        </a>
+    </div>
+
+    <div class="tr-layout">
+        <section class="tr-card">
+            <div class="tr-card-head">
+                <h2><i class="bi bi-journal-text me-2" style="color:#d98a55"></i>Research proposal details</h2>
+                <p>Complete the required fields carefully. You can add keywords and preferred supervisors to provide more context.</p>
+            </div>
+            <div class="tr-form-body">
+                <form action="/student/register" method="POST">
+                    <div class="tr-field">
+                        <label class="tr-label" for="thesis-title">Thesis title <span class="text-danger">*</span></label>
+                        <input id="thesis-title" type="text" class="form-control" name="title" required placeholder="Enter your proposed thesis title">
+                        <div class="tr-help">Use a specific title that reflects the main problem or research direction.</div>
+                    </div>
+
+                    <div class="tr-field">
+                        <label class="tr-label" for="thesis-abstract">Abstract / brief description <span class="text-danger">*</span></label>
+                        <textarea id="thesis-abstract" class="form-control" name="abstract" rows="5" required placeholder="Summarize your research problem, objectives, and proposed methodology..."></textarea>
+                        <div class="tr-help">Briefly explain what you want to investigate, why it matters, and how you plan to approach it.</div>
+                    </div>
+
+                    <div class="tr-field">
+                        <label class="tr-label" for="thesis-keywords">Keywords <span class="tr-optional">Optional</span></label>
+                        <input id="thesis-keywords" type="text" class="form-control" name="keywords" placeholder="e.g. Machine Learning, NLP, Data Mining">
+                        <div class="tr-help">Separate keywords with commas.</div>
+                    </div>
+
+                    <div class="tr-field">
+                        <div class="tr-supervisor-box">
+                            <label class="tr-supervisor-title" for="preferred-supervisors">
+                                <i class="bi bi-star-fill tr-star"></i> Preferred supervisors <span class="tr-optional">Optional</span>
+                            </label>
+                            <p class="tr-help mt-0 mb-3">Select one or more faculty members. On a computer, hold Ctrl (Windows) or Command (Mac) while selecting multiple names. Preferences may be considered by the allocation process subject to available capacity.</p>
+                            <select id="preferred-supervisors" class="form-select" name="preferred_supervisors" multiple size="4" aria-label="Preferred supervisors">
+                                <% if (supervisors.length === 0) { %>
+                                    <option disabled>No supervisors currently available in the system.</option>
+                                <% } else { %>
+                                    <% supervisors.forEach(sup => { %>
+                                        <option value="<%= sup.id %>"><%= sup.name %></option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="tr-submit">
+                        <i class="bi bi-send-fill"></i> Submit registration
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <aside class="tr-card tr-aside">
+            <div class="tr-aside-kicker">Before you submit</div>
+            <h3>A quick checklist</h3>
+
+            <div class="tr-step">
+                <div class="tr-step-number">01</div>
+                <div>
+                    <strong>Choose a focused title</strong>
+                    <span>Make the research topic specific enough to communicate its direction.</span>
+                </div>
+            </div>
+            <div class="tr-step">
+                <div class="tr-step-number">02</div>
+                <div>
+                    <strong>Explain the research idea</strong>
+                    <span>Include the problem, intended objectives, and a brief plan of approach.</span>
+                </div>
+            </div>
+            <div class="tr-step">
+                <div class="tr-step-number">03</div>
+                <div>
+                    <strong>Add useful keywords</strong>
+                    <span>Use a few terms that describe your topic or technical area.</span>
+                </div>
+            </div>
+            <div class="tr-step">
+                <div class="tr-step-number">04</div>
+                <div>
+                    <strong>Review before submitting</strong>
+                    <span>Check your title and description for clarity and completeness.</span>
+                </div>
+            </div>
+
+            <div class="tr-note">
+                <i class="bi bi-info-circle me-1" style="color:#d98a55"></i>
+                Preferred supervisors are optional. Selecting a preference does not guarantee assignment; availability and the department’s allocation process still apply.
+            </div>
+        </aside>
+    </div>
+</main>
+
+<%- include('../partials/footer') %>

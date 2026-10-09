@@ -1,0 +1,90 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="/css/pending-students.css">
+
+<main class="container-fluid pending-registrations-page py-4 px-md-4">
+    
+    <div class="pending-page-header">
+        <div class="pending-heading-copy">
+            <span class="pending-eyebrow"><i class="bi bi-person-check"></i> ACCOUNT MANAGEMENT</span>
+            <h1>Pending Registrations</h1>
+            <p>Review student account requests and verify their details before approval.</p>
+        </div>
+        <a href="/chairman/dashboard" class="pending-back-link"><i class="bi bi-arrow-left"></i><span>Dashboard</span></a>
+    </div>
+
+    <section class="pending-panel">
+        <div class="pending-panel-header">
+            <div>
+                <span class="pending-section-kicker">REGISTRATION REVIEW</span>
+                <h2>Approval queue</h2>
+                <p>Requests that still need a decision</p>
+            </div>
+            <span class="pending-count"><span class="pending-count-dot"></span><%= students.length %> pending</span>
+        </div>
+        
+        <div class="table-responsive">
+            <% if (students.length === 0) { %>
+                <div class="pending-empty-state">
+                    <div class="pending-empty-icon"><i class="bi bi-check2-circle"></i></div>
+                    <h3>You're all caught up</h3>
+                    <p>There are no pending registrations waiting for approval.</p>
+                </div>
+            <% } else { %>
+                <table class="table pending-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Contact &amp; verification</th>
+                            <th>Academic session</th>
+                            <th>Registration date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% students.forEach(student => { %>
+                            <tr>
+                                <td>
+                                    <div class="pending-student-name"><%= student.name %></div>
+                                    <div class="pending-student-id">ID: <%= student.student_id %></div>
+                                </td>
+                                <td>
+                                    <div class="pending-email"><i class="bi bi-envelope"></i><span><%= student.email %></span></div>
+                                    <div class="mt-1">
+                                        <% if (student.is_verified) { %>
+                                            <span class="pending-status pending-status-verified"><i class="bi bi-check2-circle"></i>Email verified</span>
+                                        <% } else { %>
+                                            <span class="pending-status pending-status-unverified"><i class="bi bi-exclamation-circle"></i>Unverified</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="pending-session"><%= student.session_name %></span>
+                                    <% if (student.start_year && student.end_year) { %>
+                                        <div class="pending-year-range"><%= student.start_year %> – <%= student.end_year %></div>
+                                    <% } %>
+                                </td>
+                                <td class="pending-date">
+                                    <%= new Date(student.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                </td>
+                                <td class="text-end">
+                                    <form action="/chairman/students/<%= student.id %>/approve" method="POST" class="d-inline">
+                                        <button type="submit" class="btn pending-approve-btn me-1" onclick="return confirm('Approve this student registration?');">
+                                            <i class="bi bi-check-lg me-1"></i>Approve
+                                        </button>
+                                    </form>
+                                    <form action="/chairman/students/<%= student.id %>/reject" method="POST" class="d-inline">
+                                        <button type="submit" class="btn pending-reject-btn" onclick="return confirm('Reject and delete this registration request?');">
+                                            Reject
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </section>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,227 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/student-dashboard.css">
+<main class="container-fluid student-dashboard-page py-4 px-md-4">
+    
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <div class="student-eyebrow"><span class="student-eyebrow-mark"></span> STUDENT WORKSPACE</div>
+            <h2 class="fw-bolder text-dark mb-1 student-page-title">Student Dashboard</h2>
+            <p class="text-secondary mb-0">Track your supervisor assignment, manage your research proposal, and follow your thesis submission milestones.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            
+            <!-- ALLOCATION STATUS -->
+            <% if (!allocation) { %>
+                <div class="card premium-card border text-center py-5 px-4 mb-4">
+                    <div class="card-body py-4">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 75px; height: 75px; font-size: 2rem;">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <h3 class="fw-bolder text-dark mb-2">Supervisor Allocation</h3>
+                        <p class="text-secondary mx-auto mb-4" style="max-width: 550px;">
+                            The department will allocate your supervisor using your submitted priority preference list and available faculty capacities[cite: 10].
+                        </p>
+                        <a href="/student/preferences" class="btn btn-primary btn-action shadow-sm">
+                            <i class="bi bi-list-ol me-2"></i> Review Supervisor Preferences
+                        </a>
+                    </div>
+                </div>
+            <% } else { %>
+            <!-- SUPERVISOR ALLOCATED -->
+                
+                <% if (typeof showSwapNotification !== 'undefined' && showSwapNotification) { %>
+                    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle-fill fs-4 text-info me-3"></i>
+                        <div>
+                            <strong>Supervisor Updated:</strong> Your supervisor assignment has been officially updated by the department via a faculty transfer or mutual swap[cite: 10]. Your dashboard now reflects your new supervisor.
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <% } %>
+
+                <div class="card premium-card border mb-4">
+                    <div class="card-header bg-transparent border-bottom pt-4 pb-3 px-4 bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bolder text-dark mb-0"><i class="bi bi-person-badge text-primary me-2"></i> Assigned Supervisor</h5>
+                        <% if (allocation.allocation_status === 'swapped') { %>
+                            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-1.5 rounded-pill">Transferred / Swapped</span>
+                        <% } else { %>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1.5 rounded-pill">Official Allocation</span>
+                        <% } %>
+                    </div>
+                    <div class="card-body p-4 p-md-4">
+                        <div>
+                            <h4 class="fw-bold text-dark mb-1"><%= allocation.supervisor_name %></h4>
+                            <p class="text-secondary mb-2"><%= allocation.designation || 'Faculty Member' %></p>
+                            <div class="d-flex flex-wrap gap-3 text-secondary small font-monospace">
+                                <span><strong class="text-dark">ID:</strong> <%= allocation.supervisor_code %></span>
+                                <span><strong class="text-dark">Email:</strong> <%= allocation.supervisor_email %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THESIS / PROPOSAL MODULE -->
+                <div class="card premium-card border mb-4">
+                    <div class="card-header bg-transparent border-bottom pt-4 pb-3 px-4 bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bolder text-dark mb-0"><i class="bi bi-journal-bookmark-fill text-dark me-2"></i> Research Proposal & Thesis Progress</h5>
+                        <% if (thesis) { %>
+                            <% 
+                                let badgeClass = 'badge-submitted';
+                                if (thesis.status === 'completed' || thesis.status === 'proposal_approved') badgeClass = 'badge-completed';
+                                else if (thesis.status === 'revision_required' || thesis.status === 'under_review') badgeClass = 'badge-review';
+                            %>
+                            <span class="badge-status <%= badgeClass %>"><%= thesis.status.replace(/_/g, ' ').toUpperCase() %></span>
+                        <% } %>
+                    </div>
+                    
+                    <div class="card-body p-4 p-md-5">
+                        <% if (!thesis || thesis.status === 'supervisor_allocated' || thesis.status === 'revision_required') { %>
+                            <!-- SUBMIT PROPOSAL FORM -->
+                       <!-- SUBMIT PROPOSAL FORM -->
+                            <% if (thesis && thesis.status === 'revision_required') { %>
+                                <div class="alert alert-warning border-0 shadow-sm rounded-4 mb-4">
+                                    <strong><i class="bi bi-exclamation-triangle-fill me-1"></i> Revision Required:</strong> 
+                                    Your supervisor requested changes. Please update your proposal and re-upload the document.
+                                    
+                                    <% if (thesis.supervisor_feedback) { %>
+                                        <hr class="my-2 border-warning">
+                                        <strong>Feedback:</strong> <%= thesis.supervisor_feedback %>
+                                    <% } %>
+
+                                    <!-- ADDED: Supervisor Feedback File in Edit Mode -->
+                                    <% if (thesis.supervisor_feedback_file) { %>
+                                        <div class="mt-3 p-3 bg-white border border-warning rounded shadow-sm d-inline-flex align-items-center gap-3">
+                                            <div>
+                                                <i class="bi bi-file-earmark-arrow-down fs-4 text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <span class="d-block fw-bold text-dark small mb-1">Attached Feedback File</span>
+                                                <a href="<%= thesis.supervisor_feedback_file %>" target="_blank" class="btn btn-sm btn-primary shadow-sm fw-bold">
+                                                    <i class="bi bi-download me-1"></i> View / Download
+                                                </a>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                </div>
+
+                            <% } else { %>
+                                <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4">
+                                    <strong><i class="bi bi-info-circle-fill me-1"></i> Ready for Proposal Submission:</strong> 
+                                    Provide your research title, abstract summary, and upload the proposal document (PDF) for your supervisor's review[cite: 10].
+                                </div>
+                            <% } %>
+
+                            <form action="/student/proposal" method="POST" enctype="multipart/form-data">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Thesis Title</label>
+                                    <input type="text" class="form-control bg-light border-0 py-2.5 fw-semibold" name="title" value="<%= thesis ? thesis.title : '' %>" required placeholder="Enter proposed thesis title">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Abstract Summary</label>
+                                    <textarea class="form-control bg-light border-0 p-3" name="abstract" rows="5" required placeholder="Briefly describe your research problem and objectives..."><%= thesis ? thesis.abstract : '' %></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-secondary small text-uppercase">Upload Proposal Document (PDF)</label>
+                                    <input type="file" class="form-control bg-light border-0 py-2.5" name="proposalDocument" accept="application/pdf" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-action shadow">
+                                    <i class="bi bi-cloud-upload-fill me-2"></i> Submit Research Proposal
+                                </button>
+                            </form>
+
+                        <% } else { %>
+                            <!-- READ ONLY PROPOSAL -->
+                            <h3 class="fw-bolder text-dark mb-3"><%= thesis.title %></h3>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2">Abstract</span>
+                            <div class="bg-light p-4 rounded-3 border text-secondary mb-4" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;"><%= thesis.abstract %></div>
+                            
+                            <% if (thesis.proposal_file) { %>
+                                <a href="<%= thesis.proposal_file %>" target="_blank" class="btn btn-outline-primary mb-4 shadow-sm bg-white">
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i> View Submitted Proposal PDF
+                                </a>
+                            <% } %>
+
+                            <% if (thesis.supervisor_feedback) { %>
+                                <div class="alert alert-secondary border-0 shadow-sm rounded-4 mt-2">
+                                    <strong><i class="bi bi-chat-square-text-fill me-1"></i> Supervisor Notes:</strong><br>
+                                    <%= thesis.supervisor_feedback %>
+                                </div>
+
+                                <!-- ADDED: Supervisor Feedback File Download -->
+                                <% if (thesis.supervisor_feedback_file) { %>
+                                    <div class="mt-3 p-3 bg-white border rounded shadow-sm d-inline-flex align-items-center gap-3">
+                                        <div>
+                                            <i class="bi bi-file-earmark-arrow-down fs-4 text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <span class="d-block fw-bold text-dark small mb-1">Attached Feedback File</span>
+                                            <a href="<%= thesis.supervisor_feedback_file %>" target="_blank" class="btn btn-sm btn-primary shadow-sm fw-bold">
+                                                <i class="bi bi-download me-1"></i> View / Download
+                                            </a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } %>
+
+                            <hr class="text-muted opacity-25 my-4">
+
+                            <!-- FINAL THESIS SUBMISSION -->
+                            <div class="mt-4">
+                                <h4 class="fw-bolder text-dark mb-3"><i class="bi bi-award-fill text-success me-2"></i> Final Thesis</h4>
+                                
+                                <% if (thesis.status === 'proposal_approved') { %>
+                                    <div class="alert alert-success border-0 shadow-sm rounded-4 mb-3">Your proposal is approved! When your research is complete, upload your final manuscript here[cite: 10].</div>
+                                    <form action="/student/final" method="POST" enctype="multipart/form-data" class="bg-light p-4 border rounded-4 shadow-sm">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-secondary small text-uppercase">Upload Final Thesis Manuscript (PDF)</label>
+                                            <input type="file" class="form-control bg-white border-0 py-2.5" name="finalDocument" accept="application/pdf" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-action shadow-sm">
+                                            <i class="bi bi-cloud-upload-fill me-2"></i> Submit Final Thesis
+                                        </button>
+                                    </form>
+
+                                <% } else if (thesis.status === 'final_submitted' || thesis.status === 'under_evaluation') { %>
+                                    <div class="alert alert-warning border-0 shadow-sm rounded-4">
+                                        <i class="bi bi-hourglass-split me-1"></i> Your final thesis has been submitted and is currently under evaluation by your supervisor[cite: 10].
+                                    </div>
+                                    <% if (thesis.final_file) { %>
+                                        <a href="<%= thesis.final_file %>" target="_blank" class="btn btn-outline-secondary mt-2 shadow-sm bg-white">
+                                            <i class="bi bi-file-earmark-pdf-fill me-1"></i> View Final Submission Document
+                                        </a>
+                                    <% } %>
+
+                                <% } else if (thesis.status === 'completed') { %>
+                                    <div class="p-4 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-4 text-center">
+                                        <h4 class="text-success fw-bold mb-2"><i class="bi bi-trophy-fill text-warning me-2"></i> Thesis Successfully Completed!</h4>
+                                        <hr class="text-success opacity-25 my-3">
+                                        <h5 class="mb-3 fw-bold text-dark">Final Grade: <span class="badge bg-success fs-4 px-4 py-2 shadow-sm"><%= thesis.final_grade || 'N/A' %></span></h5>
+                                        <% if (thesis.final_file) { %>
+                                            <a href="<%= thesis.final_file %>" target="_blank" class="btn btn-success btn-action shadow">
+                                                <i class="bi bi-download me-2"></i> Download Final Thesis Document
+                                            </a>
+                                        <% } %>
+                                    </div>
+
+                                <% } else { %>
+                                    <div class="alert alert-light border text-muted rounded-4 py-3">
+                                        <i class="bi bi-lock-fill me-1"></i> Final submission will unlock automatically after your proposal is officially approved[cite: 10].
+                                    </div>
+                                <% } %>
+                            </div>
+
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+
+        </div>
+    </div>
+</main>
+
+<%- include('../partials/footer') %>

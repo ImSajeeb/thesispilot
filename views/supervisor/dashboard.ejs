@@ -1,0 +1,151 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/supervisor-dashboard.css">
+
+<main class="supervisor-dashboard container-fluid py-4 px-md-4">
+    
+    <!-- Dashboard heading and actions -->
+    <section class="sd-page-head mb-4">
+        <div class="sd-heading-copy">
+            <div class="sd-eyebrow"><span class="sd-eyebrow-dot"></span> FACULTY WORKSPACE</div>
+            <h1>Supervisor Dashboard</h1>
+            <p>Track your supervisees, review thesis milestones, and manage transfer requests from one workspace.</p>
+        </div>
+        <div class="sd-header-actions">
+            <a href="/supervisor/swap" class="btn sd-btn-secondary">
+                <i class="bi bi-arrow-left-right"></i><span>Request transfer / swap</span>
+            </a>
+            <a href="/supervisor/swap-approvals" class="btn sd-btn-primary position-relative">
+                <i class="bi bi-inbox"></i><span>Swap approvals</span>
+                <% const totalPending = (typeof incomingRequests !== 'undefined' ? incomingRequests.length : 0); %>
+                <% if (totalPending > 0) { %><span class="sd-notification-count"><%= totalPending %></span><% } %>
+            </a>
+        </div>
+    </section>
+
+    <!-- At-a-glance workload -->
+    <section class="sd-metrics row g-3 mb-4" aria-label="Supervision overview">
+        <div class="col-12 col-sm-4">
+            <article class="sd-metric-card">
+                <div class="sd-metric-icon"><i class="bi bi-people"></i></div>
+                <div class="sd-metric-copy"><span>Assigned students</span><strong><%= students.length %></strong><small>Current supervisees</small></div>
+            </article>
+        </div>
+        <div class="col-12 col-sm-4">
+            <article class="sd-metric-card">
+                <div class="sd-metric-icon"><i class="bi bi-patch-check"></i></div>
+                <div class="sd-metric-copy"><span>Approved proposals</span><strong><%= students.filter(s => s.thesis_status === 'proposal_approved' || s.thesis_status === 'completed').length %></strong><small>Approved or completed</small></div>
+            </article>
+        </div>
+        <div class="col-12 col-sm-4">
+            <article class="sd-metric-card">
+                <div class="sd-metric-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div class="sd-metric-copy"><span>Pending review</span><strong><%= students.filter(s => s.thesis_status === 'proposal_submitted' || s.thesis_status === 'under_review').length %></strong><small>Needs your attention</small></div>
+            </article>
+        </div>
+    </section>
+    <!-- Student search and filters -->
+    <section class="sd-filter-panel mb-4">
+        <div class="sd-section-heading">
+            <div><span class="sd-section-kicker">DIRECTORY</span><h2>Find a student</h2></div>
+            <span class="sd-filter-hint"><i class="bi bi-sliders2"></i> Refine your list</span>
+        </div>
+        <form method="GET" action="/supervisor/dashboard" class="sd-filter-grid">
+            <label class="sd-filter-field sd-search-field">
+                <span>Search</span>
+                <div class="sd-input-wrap"><i class="bi bi-search"></i><input type="text" name="search" class="form-control" placeholder="Name or student ID" value="<%= filters.search %>"></div>
+            </label>
+            <label class="sd-filter-field">
+                <span>Academic session</span>
+                <select name="session_id" class="form-select" onchange="this.form.submit()">
+                    <option value="all" <%= filters.sessionId === 'all' ? 'selected' : '' %>>All sessions</option>
+                    <% sessions.forEach(session => { %><option value="<%= session.id %>" <%= Number(filters.sessionId) === Number(session.id) ? 'selected' : '' %>><%= session.session_name %><%= session.status === 'active' ? ' · Active' : '' %></option><% }) %>
+                </select>
+            </label>
+            <label class="sd-filter-field">
+                <span>Thesis milestone</span>
+                <select name="status" class="form-select">
+                    <option value="" <%= !filters.status ? 'selected' : '' %>>All milestones</option>
+                    <option value="awaiting" <%= filters.status === 'awaiting' ? 'selected' : '' %>>Awaiting submission</option>
+                    <option value="proposal_submitted" <%= filters.status === 'proposal_submitted' ? 'selected' : '' %>>Proposal submitted</option>
+                    <option value="under_review" <%= filters.status === 'under_review' ? 'selected' : '' %>>Under review</option>
+                    <option value="revision_required" <%= filters.status === 'revision_required' ? 'selected' : '' %>>Revision required</option>
+                    <option value="proposal_approved" <%= filters.status === 'proposal_approved' ? 'selected' : '' %>>Proposal approved</option>
+                    <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                </select>
+            </label>
+            <div class="sd-filter-actions"><button type="submit" class="btn sd-btn-primary"><i class="bi bi-funnel"></i> Apply filters</button><a href="/supervisor/dashboard" class="btn sd-btn-quiet">Reset</a></div>
+        </form>
+    </section>
+    <!-- Assigned Students Table Card -->
+    <div class="card premium-card">
+        <div class="sd-table-heading">
+            <div><span class="sd-section-kicker">SUPERVISION REGISTER</span><h2>Assigned students</h2><p>Review each student’s latest thesis milestone and open their record when action is needed.</p></div>
+            <span class="sd-record-count"><%= students.length %> <%= students.length === 1 ? 'student' : 'students' %></span>
+        </div>
+        <div class="table-responsive">
+            <% if (students.length === 0) { %>
+                <div class="sd-empty-state">
+                    <div class="sd-empty-icon"><i class="bi bi-mortarboard"></i></div>
+                    <h3>No students assigned yet</h3>
+                    <p>Students will appear here once the Chairman confirms and locks an allocation run.</p>
+                </div>
+            <% } else { %>
+                <table class="table sd-student-table">
+                    <thead>
+                        <tr>
+                            <th class="sd-student-col">Student</th>
+                            <th>Research topic</th>
+                            <th>Milestone</th>
+                            <th>Last activity</th>
+                            <th class="sd-action-col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% students.forEach(student => { %>
+                            <tr>
+                                <td class="sd-student-col">
+                                    <div class="sd-student-name"><span class="sd-avatar"><i class="bi bi-person"></i></span><span><strong><%= student.student_name %></strong><small>ID · <%= student.student_code %></small></span></div>
+                                </td>
+                                <td>
+                                    <% if (student.title) { %>
+                                        <span class="sd-thesis-title"><%= student.title %></span>
+                                    <% } else { %>
+                                        <span class="sd-not-submitted">Title not submitted</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% 
+                                        let badgeClass = 'badge-awaiting';
+                                        let readableStatus = 'Awaiting Submission';
+                                        if (student.thesis_status) {
+                                            readableStatus = student.thesis_status.replace(/_/g, ' ').toUpperCase();
+                                            if (student.thesis_status === 'completed' || student.thesis_status === 'proposal_approved') badgeClass = 'badge-completed';
+                                            else if (student.thesis_status === 'revision_required' || student.thesis_status === 'under_review') badgeClass = 'badge-review';
+                                            else if (student.thesis_status === 'proposal_submitted') badgeClass = 'badge-submitted';
+                                        }
+                                    %>
+                                    <span class="badge-status <%= badgeClass %>"><%= readableStatus %></span>
+                                </td>
+                                <td>
+                                    <small class="sd-date"><%= student.updated_at ? new Date(student.updated_at).toLocaleDateString() : '—' %></small>
+                                </td>
+                                <td class="sd-action-col">
+                                    <% if (student.thesis_id) { %>
+                                        <a href="/supervisor/thesis/<%= student.thesis_id %>/review" class="btn sd-review-btn">
+                                            <i class="bi bi-eye me-1"></i> Review
+                                        </a>
+                                    <% } else { %>
+                                        <button class="btn sd-waiting-btn" disabled>Waiting...</button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+</main>
+
+<%- include('../partials/footer') %>

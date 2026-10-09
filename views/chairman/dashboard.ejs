@@ -1,0 +1,249 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="/css/chairman-dashboard.css">
+
+<%
+    let activeSession = typeof selectedSession !== 'undefined'
+        ? selectedSession
+        : (sessions.find(s => s.status === 'active') || sessions[0]);
+%>
+
+<main class="chairman-dashboard">
+    <header class="dashboard-heading">
+        <div class="dashboard-heading-copy">
+            <div class="dashboard-eyebrow"><span class="dashboard-eyebrow-dot"></span> DEPARTMENT ADMINISTRATION</div>
+            <h1>Chairman Dashboard</h1>
+            <p>Manage thesis allocation, student registrations, faculty capacity, and research progress from one place.</p>
+        </div>
+        <div class="dashboard-heading-actions">
+            <div class="department-chip">
+                <i class="bi bi-building"></i>
+                <span><%= chairman.department_name %><% if (chairman.department_code) { %> <span class="department-code">/ <%= chairman.department_code %></span><% } %></span>
+            </div>
+            <button type="button" class="dashboard-btn dashboard-btn-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="bi bi-shield-lock"></i><span>Change password</span>
+            </button>
+        </div>
+    </header>
+
+    <% if (sessions && sessions.length > 0) { %>
+        <section class="active-session-panel" aria-labelledby="activeSessionTitle">
+            <div class="session-panel-main">
+                <div class="session-icon"><i class="bi bi-calendar2-check"></i></div>
+                <div class="session-panel-copy">
+                    <div class="session-panel-label"><span class="session-live-dot"></span> DASHBOARD SESSION</div>
+                    <h2 id="activeSessionTitle"><%= activeSession ? activeSession.session_name : 'No session selected' %></h2>
+                    <% if (activeSession && activeSession.start_year) { %>
+                        <p>Academic year <%= activeSession.start_year %>–<%= activeSession.end_year %></p>
+                    <% } else { %>
+                        <p>Review and manage the selected academic session.</p>
+                    <% } %>
+                </div>
+            </div>
+            <button type="button" class="dashboard-btn dashboard-btn-copper" data-bs-toggle="modal" data-bs-target="#switchSessionModal">
+                <i class="bi bi-arrow-left-right"></i> Switch session
+            </button>
+        </section>
+
+        <div class="modal fade dashboard-modal" id="switchSessionModal" tabindex="-1" aria-labelledby="switchSessionTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <div class="modal-kicker">SESSION SETTINGS</div>
+                            <h2 class="modal-title" id="switchSessionTitle">Switch academic session</h2>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="/chairman/sessions/set-active" method="POST">
+                        <div class="modal-body">
+                            <div class="dashboard-notice dashboard-notice-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <p>Changing the active session changes the session context used across the dashboard, student filters, and allocation center.</p>
+                            </div>
+                            <label class="dashboard-label" for="activeSessionSelect">Academic session</label>
+                            <select id="activeSessionSelect" name="session_id" class="form-select dashboard-input" required>
+                                <% sessions.forEach(session => { %>
+                                    <option value="<%= session.id %>" <%= activeSession && Number(activeSession.id) === Number(session.id) ? 'selected' : '' %>>
+                                        <%= session.session_name %><%= session.status === 'active' ? ' — Currently active' : '' %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="dashboard-btn dashboard-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="dashboard-btn dashboard-btn-copper">Activate session</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <section class="dashboard-section" aria-labelledby="overviewTitle">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">AT A GLANCE</div>
+                <h2 id="overviewTitle">Department overview</h2>
+                <p>Key figures for your department.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-stats-grid">
+            <article class="dashboard-stat">
+                <div class="stat-topline"><span class="stat-icon"><i class="bi bi-mortarboard"></i></span><span class="stat-context">STUDENTS</span></div>
+                <div class="stat-value"><%= stats.students %></div>
+                <div class="stat-label">Registered students</div>
+            </article>
+            <article class="dashboard-stat stat-attention">
+                <div class="stat-topline"><span class="stat-icon"><i class="bi bi-person-check"></i></span><span class="stat-context">REVIEW</span></div>
+                <div class="stat-value"><%= stats.pendingStudents %></div>
+                <div class="stat-label">Pending registrations</div>
+                <% if (stats.pendingStudents > 0) { %><a class="stat-action" href="/chairman/pending-students">Review registrations <i class="bi bi-arrow-up-right"></i></a><% } %>
+            </article>
+            <article class="dashboard-stat">
+                <div class="stat-topline"><span class="stat-icon"><i class="bi bi-person-workspace"></i></span><span class="stat-context">FACULTY</span></div>
+                <div class="stat-value"><%= stats.supervisors %></div>
+                <div class="stat-label">Supervisors</div>
+            </article>
+            <article class="dashboard-stat stat-positive">
+                <div class="stat-topline"><span class="stat-icon"><i class="bi bi-journal-check"></i></span><span class="stat-context">ALLOCATION</span></div>
+                <div class="stat-value"><%= stats.allocatedStudents %></div>
+                <div class="stat-label">Theses allocated</div>
+            </article>
+            <article class="dashboard-stat <%= Number(stats.studentsWithoutSupervisor) > 0 ? 'stat-attention' : 'stat-positive' %>">
+                <div class="stat-topline"><span class="stat-icon"><i class="bi bi-diagram-2"></i></span><span class="stat-context">ALLOCATION</span></div>
+                <div class="stat-value"><%= stats.studentsWithoutSupervisor %></div>
+                <div class="stat-label">Students without a supervisor</div>
+                <% if (Number(stats.studentsWithoutSupervisor) > 0) { %><a class="stat-action" href="/chairman/allocation">Review allocation <i class="bi bi-arrow-up-right"></i></a><% } %>
+            </article>
+            <article class="dashboard-stat <%= Number(stats.pendingSwaps) > 0 ? 'stat-attention' : '' %>">
+                <div class="stat-topline"><span class="stat-icon"><i class="bi bi-arrow-left-right"></i></span><span class="stat-context">REQUESTS</span></div>
+                <div class="stat-value"><%= stats.pendingSwaps %></div>
+                <div class="stat-label">Pending swap requests</div>
+                <% if (stats.pendingSwaps > 0) { %><a class="stat-action" href="/chairman/swaps">Review requests <i class="bi bi-arrow-up-right"></i></a><% } %>
+            </article>
+        </div>
+    </section>
+
+    <div class="dashboard-workspace">
+        <section class="dashboard-panel operations-panel" aria-labelledby="operationsTitle">
+            <div class="panel-heading">
+                <div class="panel-heading-icon"><i class="bi bi-grid"></i></div>
+                <div>
+                    <h2 id="operationsTitle">Operations center</h2>
+                    <p>Choose a task to manage the thesis workflow.</p>
+                </div>
+            </div>
+            <div class="operations-grid">
+                <a href="/chairman/pending-students" class="operation-link">
+                    <span class="operation-icon operation-icon-copper"><i class="bi bi-person-plus"></i></span>
+                    <span class="operation-copy"><strong>Registration review</strong><small>Approve or reject student accounts.</small></span>
+                    <% if (Number(stats.pendingStudents) > 0) { %><span class="operation-count"><%= stats.pendingStudents %></span><% } %>
+                    <i class="bi bi-arrow-up-right operation-arrow"></i>
+                </a>
+                <a href="/chairman/allocation" class="operation-link">
+                    <span class="operation-icon"><i class="bi bi-diagram-3"></i></span>
+                    <span class="operation-copy"><strong>Allocation center</strong><small>Run allocation and assign supervisors.</small></span>
+                    <i class="bi bi-arrow-up-right operation-arrow"></i>
+                </a>
+                <a href="/chairman/swaps" class="operation-link">
+                    <span class="operation-icon operation-icon-rose"><i class="bi bi-arrow-left-right"></i></span>
+                    <span class="operation-copy"><strong>Supervisor swap requests</strong><small>Review and process transfer requests.</small></span>
+                    <% if (Number(stats.pendingSwaps) > 0) { %><span class="operation-count"><%= stats.pendingSwaps %></span><% } %>
+                    <i class="bi bi-arrow-up-right operation-arrow"></i>
+                </a>
+                <a href="/chairman/theses" class="operation-link">
+                    <span class="operation-icon operation-icon-violet"><i class="bi bi-journal-bookmark"></i></span>
+                    <span class="operation-copy"><strong>Thesis management</strong><small>Track research topics and thesis progress.</small></span>
+                    <i class="bi bi-arrow-up-right operation-arrow"></i>
+                </a>
+                <a href="/chairman/students" class="operation-link">
+                    <span class="operation-icon operation-icon-green"><i class="bi bi-mortarboard"></i></span>
+                    <span class="operation-copy"><strong>Student directory</strong><small>Search records and manage enrolments.</small></span>
+                    <i class="bi bi-arrow-up-right operation-arrow"></i>
+                </a>
+                <a href="/chairman/supervisors" class="operation-link">
+                    <span class="operation-icon operation-icon-blue"><i class="bi bi-person-badge"></i></span>
+                    <span class="operation-copy"><strong>Supervisor directory</strong><small>Manage faculty and supervision capacity.</small></span>
+                    <i class="bi bi-arrow-up-right operation-arrow"></i>
+                </a>
+            </div>
+        </section>
+
+        <section class="dashboard-panel pipeline-panel" aria-labelledby="pipelineTitle">
+            <div class="panel-heading">
+                <div class="panel-heading-icon panel-heading-icon-copper"><i class="bi bi-signpost-split"></i></div>
+                <div>
+                    <h2 id="pipelineTitle">Thesis pipeline</h2>
+                    <p>Current progress across research stages.</p>
+                </div>
+            </div>
+            <div class="pipeline-list">
+                <div class="pipeline-item">
+                    <span class="pipeline-marker pipeline-marker-neutral"></span>
+                    <span class="pipeline-label">Supervisor allocated</span>
+                    <strong><%= stats.supervisorAllocated %></strong>
+                </div>
+                <div class="pipeline-item">
+                    <span class="pipeline-marker pipeline-marker-blue"></span>
+                    <span class="pipeline-label">Proposal submitted</span>
+                    <strong><%= stats.proposalSubmitted %></strong>
+                </div>
+                <div class="pipeline-item">
+                    <span class="pipeline-marker pipeline-marker-amber"></span>
+                    <span class="pipeline-label">Under review / revision</span>
+                    <strong><%= Number(stats.underReview) + Number(stats.revisionRequired) %></strong>
+                </div>
+                <div class="pipeline-item">
+                    <span class="pipeline-marker pipeline-marker-cyan"></span>
+                    <span class="pipeline-label">Proposal approved</span>
+                    <strong><%= stats.proposalApproved %></strong>
+                </div>
+                <div class="pipeline-item pipeline-item-complete">
+                    <span class="pipeline-marker pipeline-marker-green"></span>
+                    <span class="pipeline-label">Successfully completed</span>
+                    <strong><%= stats.completed %></strong>
+                </div>
+            </div>
+            <div class="pipeline-footnote"><i class="bi bi-info-circle"></i> Counts reflect the thesis statuses available to this dashboard.</div>
+        </section>
+    </div>
+</main>
+
+<div class="modal fade dashboard-modal" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-kicker">ACCOUNT SECURITY</div>
+                    <h2 class="modal-title" id="changePasswordTitle">Change password</h2>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/chairman/profile/update-password" method="POST">
+                <div class="modal-body">
+                    <p class="modal-intro">Choose a new password to keep your chairman account secure.</p>
+                    <div class="mb-3">
+                        <label class="dashboard-label" for="currentPassword">Current password</label>
+                        <input id="currentPassword" type="password" name="current_password" class="form-control dashboard-input" autocomplete="current-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="dashboard-label" for="newPassword">New password</label>
+                        <input id="newPassword" type="password" name="new_password" minlength="4" class="form-control dashboard-input" autocomplete="new-password" required>
+                    </div>
+                    <div class="mb-1">
+                        <label class="dashboard-label" for="confirmPassword">Confirm new password</label>
+                        <input id="confirmPassword" type="password" name="confirm_password" minlength="4" class="form-control dashboard-input" autocomplete="new-password" required>
+                    </div>
+                    <p class="password-hint"><i class="bi bi-lock"></i> Your current password is required to make this change.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="dashboard-btn dashboard-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="dashboard-btn dashboard-btn-copper"><i class="bi bi-shield-check"></i> Update password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

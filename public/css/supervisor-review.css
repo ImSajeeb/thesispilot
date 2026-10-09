@@ -1,0 +1,54 @@
+/* ThesisPilot — Supervisor thesis review | Onyx–Copper */
+.supervisor-review-page{--rv-bg:#101112;--rv-panel:#181a1c;--rv-panel2:#1e2022;--rv-border:#303235;--rv-text:#f2f0ed;--rv-muted:#a5a5a5;--rv-copper:#c88755;--rv-copper-light:#e0a779;--rv-amber:#d8a34e; color:var(--rv-text); min-height:calc(100vh - 80px); background:radial-gradient(ellipse at 12% 0%,rgba(200,135,85,.08),transparent 35%),var(--rv-bg); padding:32px clamp(16px,3vw,42px) 52px;}
+.supervisor-review-page .review-shell{max-width:1180px;margin:0 auto}
+.supervisor-review-page .review-eyebrow{display:flex;align-items:center;gap:10px;color:var(--rv-copper-light);font-size:.68rem;font-weight:800;letter-spacing:.16em;margin-bottom:10px}
+.supervisor-review-page .review-eyebrow span{width:4px;height:4px;border-radius:50%;background:var(--rv-copper)}
+.supervisor-review-page .review-page-title{font-size:clamp(1.7rem,2.5vw,2.35rem);letter-spacing:-.045em!important;color:var(--rv-text)!important;line-height:1.15}
+.supervisor-review-page .text-dark,.supervisor-review-page .fw-bold.text-dark,.supervisor-review-page h3.text-dark,.supervisor-review-page h4.text-dark,.supervisor-review-page h5.text-dark{color:var(--rv-text)!important}
+.supervisor-review-page .text-secondary{color:var(--rv-muted)!important}
+.supervisor-review-page .premium-card{background:var(--rv-panel);border:1px solid var(--rv-border)!important;border-radius:16px;box-shadow:0 14px 38px rgba(0,0,0,.2);overflow:hidden;margin-bottom:22px}
+.supervisor-review-page .card-header{background:#202224!important;border-color:var(--rv-border)!important;color:var(--rv-text)}
+.supervisor-review-page .card-body{color:var(--rv-text)}
+.supervisor-review-page hr{border-color:var(--rv-border)!important;opacity:1!important}
+.supervisor-review-page .badge-status{display:inline-flex;align-items:center;padding:7px 10px;border-radius:7px;font-size:.67rem;line-height:1.1;font-weight:800;letter-spacing:.055em;text-transform:uppercase;white-space:normal}
+.supervisor-review-page .badge-submitted{background:rgba(200,135,85,.13);color:var(--rv-copper-light);border:1px solid rgba(200,135,85,.3)}
+.supervisor-review-page .badge-review{background:rgba(216,163,78,.13);color:#edc77f;border:1px solid rgba(216,163,78,.3)}
+.supervisor-review-page .badge-approved{background:rgba(200,135,85,.13);color:var(--rv-copper-light);border:1px solid rgba(200,135,85,.3)}
+.supervisor-review-page .badge-completed{background:rgba(200,135,85,.15);color:#e9b58e;border:1px solid rgba(200,135,85,.35)}
+.supervisor-review-page .btn-action{border-radius:9px;padding:.7rem 1.15rem;font-weight:700;transition:transform .18s ease,background .18s ease,border-color .18s ease}
+.supervisor-review-page .btn-action:hover{transform:translateY(-1px)}
+.supervisor-review-page .btn-primary,.supervisor-review-page .btn-success{background:var(--rv-copper)!important;border-color:var(--rv-copper)!important;color:#171311!important}
+.supervisor-review-page .btn-primary:hover,.supervisor-review-page .btn-success:hover{background:var(--rv-copper-light)!important;border-color:var(--rv-copper-light)!important}
+.supervisor-review-page .btn-outline-primary,.supervisor-review-page .btn-outline-success{color:var(--rv-copper-light)!important;border-color:rgba(200,135,85,.55)!important;background:rgba(200,135,85,.04)!important}
+.supervisor-review-page .btn-outline-primary:hover,.supervisor-review-page .btn-outline-success:hover{background:rgba(200,135,85,.14)!important}
+.supervisor-review-page .btn-light,.supervisor-review-page .btn-outline-secondary{background:#242628!important;border-color:#3b3d40!important;color:#ddd!important}
+.supervisor-review-page .bg-light{background:var(--rv-panel2)!important}
+.supervisor-review-page .bg-white{background:#202224!important}
+.supervisor-review-page .border,.supervisor-review-page .border-top,.supervisor-review-page .border-bottom{border-color:var(--rv-border)!important}
+.supervisor-review-page .form-control,.supervisor-review-page .form-select{background:#121314!important;border:1px solid #393b3e!important;color:var(--rv-text)!important;border-radius:9px;padding:.8rem .95rem}
+.supervisor-review-page .form-control::placeholder{color:#777!important}
+.supervisor-review-page .form-control:focus,.supervisor-review-page .form-select:focus{border-color:var(--rv-copper)!important;box-shadow:0 0 0 .2rem rgba(200,135,85,.15)!important}
+.supervisor-review-page input[type=file].form-control{padding:.65rem}
+.supervisor-review-page .form-label{color:#d5d0ca!important;letter-spacing:.045em}
+.supervisor-review-page .review-record-card .card-body{padding:clamp(20px,3vw,36px)!important}
+.supervisor-review-page .review-record-card .row.mb-4{background:#202224;border:1px solid var(--rv-border);border-radius:12px;padding:18px 6px;margin-left:0;margin-right:0}
+.supervisor-review-page .review-record-card h3{font-size:clamp(1.25rem,2vw,1.8rem);line-height:1.35;overflow-wrap:anywhere}
+.supervisor-review-page .review-record-card .bg-light.p-4{border:1px solid var(--rv-border)!important;border-radius:12px!important;color:#c7c4c0!important}
+.supervisor-review-page .review-action-card{border-top:3px solid var(--rv-copper)!important}
+.supervisor-review-page .final-evaluation-card{border-top-color:var(--rv-amber)!important}
+.supervisor-review-page .review-section-kicker{font-size:.67rem;font-weight:800;letter-spacing:.15em;color:var(--rv-copper-light);margin-bottom:8px}
+.supervisor-review-page .btn-check:checked+.btn-outline-info{background:rgba(200,135,85,.16)!important;border-color:var(--rv-copper)!important;color:var(--rv-copper-light)!important}
+.supervisor-review-page .btn-check:checked+.btn-outline-warning{background:rgba(216,163,78,.16)!important;border-color:var(--rv-amber)!important;color:#f0ca82!important}
+.supervisor-review-page .btn-check:checked+.btn-outline-success{background:rgba(200,135,85,.16)!important;border-color:var(--rv-copper)!important;color:var(--rv-copper-light)!important}
+.supervisor-review-page .alert-danger{background:rgba(175,60,60,.13)!important;border:1px solid rgba(210,90,90,.3)!important;color:#f0b0b0!important}
+.supervisor-review-page .text-danger{color:#e28a82!important}
+.supervisor-review-page .text-success{color:var(--rv-copper-light)!important}
+.supervisor-review-page .text-primary{color:var(--rv-copper-light)!important}
+.supervisor-review-page .bg-success.bg-opacity-10{background:rgba(200,135,85,.1)!important}
+.supervisor-review-page .border-success.border-opacity-25{border-color:rgba(200,135,85,.35)!important}
+.supervisor-review-page .bg-success:not(.btn-success){background:var(--rv-copper)!important;color:#171311!important}
+.supervisor-review-page .text-warning{color:#edc77f!important}
+.supervisor-review-page .text-info{color:var(--rv-copper-light)!important}
+.supervisor-review-page .review-record-card .btn{white-space:normal}
+@media(max-width:767.98px){.supervisor-review-page{padding:24px 14px 36px}.supervisor-review-page .card-header{align-items:flex-start!important;gap:12px;flex-wrap:wrap}.supervisor-review-page .review-record-card .row.mb-4{gap:16px}.supervisor-review-page .review-action-card .card-body{padding:22px!important}.supervisor-review-page .btn-action{width:100%}}
+@media(prefers-reduced-motion:reduce){.supervisor-review-page *{transition:none!important;animation:none!important}}

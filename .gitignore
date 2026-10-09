@@ -1,0 +1,18 @@
+
+node_modules/
+.env
+.env.*
+!.env.example
+.git/
+*.log
+.DS_Store
+
+# Local uploaded documents
+uploads/
+public/uploads/
+
+# Database exports and backups
+*.sql
+*.sql.gz
+*.dump
+*.bak

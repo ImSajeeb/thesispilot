@@ -1,0 +1,56 @@
+/* Chairman Thesis Management — Onyx / Copper */
+.chairman-theses-page{max-width:1480px;margin-inline:auto;color:#eee;--th-copper:#d18a5b;--th-copper-bright:#e5a477;--th-bg:#111315;--th-panel:#191c1f;--th-panel-raised:#202428;--th-border:#30353a;--th-muted:#9ca3ab;--th-text:#f2f0ed}
+.chairman-theses-page .theses-eyebrow{display:flex;align-items:center;gap:9px;color:var(--th-copper);font-size:.68rem;font-weight:800;letter-spacing:.16em;margin-bottom:.55rem}
+.chairman-theses-page .theses-eyebrow-line{width:24px;height:2px;background:var(--th-copper);display:inline-block}
+.chairman-theses-page .theses-page-title{color:var(--th-text);font-size:clamp(1.65rem,2.4vw,2.2rem);font-weight:780;letter-spacing:-.045em}
+.chairman-theses-page .theses-page-subtitle{color:var(--th-muted);max-width:720px;line-height:1.65;font-size:.94rem}
+.chairman-theses-page .btn-action{border-radius:9px;padding:.68rem 1rem;font-size:.82rem;font-weight:700;transition:background .18s,border-color .18s,transform .18s}
+.chairman-theses-page .theses-btn-secondary{background:var(--th-copper);border:1px solid var(--th-copper);color:#171310}
+.chairman-theses-page .theses-btn-secondary:hover{background:var(--th-copper-bright);border-color:var(--th-copper-bright);color:#171310;transform:translateY(-1px)}
+.chairman-theses-page .theses-btn-quiet{background:transparent;border:1px solid var(--th-border);color:#d8dadd}
+.chairman-theses-page .theses-btn-quiet:hover{background:var(--th-panel-raised);color:#fff;border-color:#555c63}
+.chairman-theses-page .row.g-3.mb-4{margin-bottom:1.4rem!important}
+.chairman-theses-page .stat-box{height:100%;min-height:112px;background:linear-gradient(145deg,#1c2023,#17191b);border:1px solid var(--th-border);border-radius:13px;padding:1.15rem 1.25rem;text-align:left;box-shadow:none;position:relative;overflow:hidden}
+.chairman-theses-page .stat-box:after{content:"";position:absolute;right:0;top:0;width:3px;height:100%;background:var(--th-copper);opacity:.8}
+.chairman-theses-page .stat-label{color:#a8adb3;font-size:.67rem;font-weight:750;letter-spacing:.09em;line-height:1.5;margin-bottom:.7rem}
+.chairman-theses-page .stat-val{font-size:1.9rem;font-weight:800;color:#f4f1ed;line-height:1;letter-spacing:-.04em}
+.chairman-theses-page .stat-val.text-primary,.chairman-theses-page .stat-val.text-info,.chairman-theses-page .stat-val.text-warning,.chairman-theses-page .stat-val.text-success{color:var(--th-copper)!important}
+.chairman-theses-page .theses-filter-panel,.chairman-theses-page .theses-records-panel{background:var(--th-panel);border:1px solid var(--th-border);border-radius:14px;overflow:hidden;box-shadow:0 12px 32px #00000012}
+.chairman-theses-page .theses-filter-panel{padding:1.25rem 1.35rem}
+.chairman-theses-page .theses-panel-heading{display:flex;align-items:center;gap:.85rem;margin-bottom:1.1rem}
+.chairman-theses-page .theses-panel-icon{width:38px;height:38px;display:grid;place-items:center;border:1px solid #75513b;background:#30251e;color:var(--th-copper);border-radius:10px;font-size:1rem;flex:none}
+.chairman-theses-page .theses-panel-heading h3,.chairman-theses-page .theses-records-heading h3{font-size:1rem;font-weight:750;color:var(--th-text);margin:0 0 .25rem}
+.chairman-theses-page .theses-panel-heading p,.chairman-theses-page .theses-records-heading p{font-size:.8rem;color:var(--th-muted);margin:0;line-height:1.5}
+.chairman-theses-page .theses-select{min-height:43px;background-color:#121416;color:#e8e8e8;border:1px solid #373c41;border-radius:8px;font-size:.86rem;font-weight:550;padding:.65rem 2.3rem .65rem .85rem}
+.chairman-theses-page .theses-select:focus{border-color:var(--th-copper);box-shadow:0 0 0 3px #d18a5b20}
+.chairman-theses-page .theses-select option{background:#191c1f;color:#f2f0ed}
+.chairman-theses-page .theses-btn-reset{min-height:43px;border:1px solid #484047;background:#211c20;color:#e3a0a0;border-radius:8px;font-size:.82rem;font-weight:700}
+.chairman-theses-page .theses-btn-reset:hover{background:#302125;border-color:#875353;color:#ffc0c0}
+.chairman-theses-page .theses-records-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.35rem 1.45rem;border-bottom:1px solid var(--th-border)}
+.chairman-theses-page .theses-section-kicker{font-size:.64rem;font-weight:800;letter-spacing:.14em;color:var(--th-copper);margin-bottom:.45rem}
+.chairman-theses-page .theses-records-heading h3{font-size:1.1rem;margin-bottom:.3rem}
+.chairman-theses-page .theses-count{white-space:nowrap;border:1px solid #4a3b31;background:#2a211b;color:#d9b49a;border-radius:8px;padding:.55rem .75rem;font-size:.75rem}
+.chairman-theses-page .theses-count strong{color:#f4c19c;font-size:.95rem;margin-right:.25rem}
+.chairman-theses-page .table-responsive{overflow-x:auto}
+.chairman-theses-page .theses-table{margin:0;min-width:760px;color:var(--th-text);border-collapse:separate;border-spacing:0}
+.chairman-theses-page .theses-table thead th{background:#151719;color:#9299a1;font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:1rem 1.25rem;border-bottom:1px solid var(--th-border);white-space:nowrap}
+.chairman-theses-page .theses-table tbody td{background:transparent;color:#d9dadd;padding:1.15rem 1.25rem;vertical-align:middle;border-bottom:1px solid #2b2f33;font-size:.86rem}
+.chairman-theses-page .theses-table tbody tr:last-child td{border-bottom:0}
+.chairman-theses-page .theses-table tbody tr:hover td{background:#222629}
+.chairman-theses-page .theses-student-name{color:#f3f0ec;font-weight:750;line-height:1.45}
+.chairman-theses-page .font-monospace{color:#9da3aa!important;font-size:.75rem}
+.chairman-theses-page .theses-title-text{color:#e9e6e2;font-weight:650;line-height:1.55;max-width:390px;min-width:190px;white-space:normal}
+.chairman-theses-page .theses-supervisor{display:flex;align-items:center;gap:.55rem;color:#e0d2c7;font-weight:650;line-height:1.45;min-width:145px}
+.chairman-theses-page .theses-supervisor-icon{display:grid;place-items:center;width:29px;height:29px;border:1px solid #4b3b30;background:#2b211b;border-radius:8px;color:var(--th-copper);flex:none}
+.chairman-theses-page .badge-status{padding:.48rem .68rem;border-radius:6px;font-size:.63rem;letter-spacing:.045em;font-weight:800;line-height:1.4;white-space:normal;max-width:175px}
+.chairman-theses-page .badge-allocated{background:#292d31;color:#c0c5ca;border:1px solid #444a50}
+.chairman-theses-page .badge-submitted{background:#30251f;color:#e5b18c;border:1px solid #684a35}
+.chairman-theses-page .badge-review{background:#30291c;color:#e8c477;border:1px solid #66512d}
+.chairman-theses-page .badge-approved{background:#29251f;color:#e4c4a8;border:1px solid #66513e}
+.chairman-theses-page .badge-completed{background:#29251f;color:#efc29f;border:1px solid #74513a}
+.chairman-theses-page .badge.bg-light.text-danger{background:#302124!important;color:#e8a3a3!important;border-color:#704347!important}
+.chairman-theses-page .theses-empty-icon{width:58px;height:58px;margin:0 auto 1rem;display:grid;place-items:center;border:1px solid #3e342c;border-radius:16px;background:#29221c;color:var(--th-copper);font-size:1.6rem}
+.chairman-theses-page .text-muted,.chairman-theses-page .text-secondary{color:var(--th-muted)!important}
+.chairman-theses-page .print-title{display:none}
+@media(max-width:767.98px){.chairman-theses-page{padding-top:1.2rem!important}.chairman-theses-page .theses-records-heading{align-items:flex-start;flex-direction:column;padding:1.1rem}.chairman-theses-page .theses-filter-panel{padding:1rem}.chairman-theses-page .stat-box{padding:1rem;min-height:100px}.chairman-theses-page .stat-label{font-size:.61rem}.chairman-theses-page .stat-val{font-size:1.65rem}.chairman-theses-page .theses-page-subtitle{font-size:.86rem}}
+@media print{body{background:#fff!important;color:#111!important}.chairman-theses-page{max-width:100%!important;padding:0!important;color:#111!important}.chairman-theses-page .d-print-none,.navbar,footer,form{display:none!important}.chairman-theses-page .theses-records-panel{border:0!important;box-shadow:none!important;background:#fff!important}.chairman-theses-page .print-title{display:block!important;font-size:22px;font-weight:bold;margin:0 0 20px;text-align:center;color:#111}.chairman-theses-page .table-responsive{max-height:none!important;overflow:visible!important}.chairman-theses-page .theses-table{min-width:0!important}.chairman-theses-page .theses-table th,.chairman-theses-page .theses-table td{padding:.6rem .7rem!important;border:1px solid #cbd5e1!important;background:#fff!important;color:#111!important}.chairman-theses-page .theses-title-text,.chairman-theses-page .theses-student-name,.chairman-theses-page .theses-supervisor{color:#111!important}.chairman-theses-page .badge-status{color:#222!important;background:#f1f1f1!important;border:1px solid #bbb!important}@page{size:landscape;margin:12mm}}

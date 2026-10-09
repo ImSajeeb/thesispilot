@@ -1,0 +1,314 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/student-supervisor-preferences.css">
+
+<main class="student-preferences-page">
+<div class="container-fluid preferences-shell py-4 px-md-4">
+
+    <!-- Header -->
+    <div class="preferences-topbar">
+        <div>
+            <div class="page-kicker">Student workspace / Allocation planning</div>
+            <h1 class="page-heading"><i class="bi bi-list-ol me-2" style="color:var(--sp-copper)"></i>Supervisor Preferences</h1>
+            <p class="page-subtitle mb-0">Choose the faculty members you would like to work with, then arrange them in your preferred order.</p>
+        </div>
+        <div><a href="/student/dashboard" class="btn btn-outline-copper btn-action"><i class="bi bi-arrow-left me-2"></i>Dashboard</a></div>
+    </div>
+
+    <!-- Flash Messages -->
+    <!-- <% if (successMsg) { %>
+        <div class="alert alert-success border-0 shadow-sm rounded-4 alert-dismissible fade show mb-4">
+            <i class="bi bi-check-circle-fill me-1"></i> <%= successMsg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <% } %>
+
+    <% if (errorMsg) { %>
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 alert-dismissible fade show mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> <%= errorMsg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <% } %> -->
+
+    <!-- Student Information Strip -->
+    <div class="card premium-card student-summary p-3 mb-4">
+        <div class="row g-3 text-secondary">
+            <div class="student-summary-item">
+                <small class="d-block text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Student</small>
+                <strong class="text-dark"><%= student.name %></strong>
+            </div>
+            <div class="student-summary-item">
+                <small class="d-block text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Student ID</small>
+                <strong class="text-dark font-monospace"><%= student.student_id %></strong>
+            </div>
+            <div class="student-summary-item">
+                <small class="d-block text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Department</small>
+                <strong class="text-dark"><%= student.department_name %></strong>
+            </div>
+            <div class="student-summary-item">
+                <small class="d-block text-uppercase fw-bold text-muted" style="font-size: 0.7rem;">Academic Session</small>
+                <strong class="text-dark"><%= student.session_name %></strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Allocation Status Notice -->
+    <% if (allocationRun) { %>
+        <div class="alert border-0 shadow-sm rounded-4 mb-4 <%= preferencesLocked ? 'alert-danger' : 'alert-info' %>">
+            <% if (preferencesLocked) { %>
+                <i class="bi bi-lock-fill me-1"></i> <strong>Preferences Locked:</strong> The allocation process has been confirmed or locked. Your preference list can no longer be modified.
+            <% } else { %>
+                <i class="bi bi-info-circle-fill me-1"></i> <strong>Allocation Status:</strong> <span class="text-uppercase fw-bold"><%= allocationRun.status %></span>. You may update your preference list.
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="alert alert-warning border-0 shadow-sm rounded-4 mb-4">
+            <i class="bi bi-hourglass-split me-1"></i> <strong>Allocation Not Started:</strong> You can prepare your supervisor choices. The chairman will utilize these rankings during the run.
+        </div>
+    <% } %>
+
+    <form action="/student/preferences/save" method="POST" id="preferenceForm">
+        <div class="row g-4">
+
+            <!-- Available Supervisors -->
+            <div class="col-lg-7">
+                <div class="card premium-card border h-100 mb-0">
+                    <div class="card-header bg-transparent border-bottom pt-4 pb-3 px-4 bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bolder text-dark mb-0"><i class="bi bi-people-fill text-primary me-2"></i> Available Supervisors</h5>
+                        <span class="badge available-count rounded-pill px-3 py-2"><%= supervisors.length %> Available</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-3 bg-light border-bottom text-secondary small">
+                            Check supervisors in the order you prefer. Your first check automatically becomes <strong>Priority 1</strong>.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th width="60" class="ps-4">Select</th>
+                                        <th>Supervisor Details</th>
+                                        <th>Specialization</th>
+                                        <th class="pe-4">Capacity Load</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (supervisors.length === 0) { %>
+                                        <tr>
+                                            <td colspan="4" class="text-center py-5 text-muted">
+                                                <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                                                No available supervisors found for your department.
+                                            </td>
+                                        </tr>
+                                    <% } else { %>
+                                        <% supervisors.forEach(supervisor => { %>
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <input type="checkbox" class="form-check-input supervisor-checkbox shadow-sm" name="supervisor_ids" value="<%= supervisor.id %>" data-name="<%= supervisor.name %>" 
+                                                        <%= preferences.some(p => Number(p.supervisor_id) === Number(supervisor.id)) ? 'checked' : '' %>
+                                                        <%= preferencesLocked ? 'disabled' : '' %>>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold text-dark"><%= supervisor.name %></div>
+                                                    <small class="text-secondary font-monospace">ID: <%= supervisor.supervisor_id %></small>
+                                                </td>
+                                                <td>
+                                                    <span class="text-secondary small"><%= supervisor.specialization || 'Not specified' %></span>
+                                                </td>
+                                                <td class="pe-4">
+                                                    <div class="small fw-bold text-dark mb-1">
+                                                        <%= supervisor.assigned_count %> / <%= supervisor.session_capacity %>
+                                                    </div>
+                                                    <div class="progress" style="height: 6px; background-color: #e2e8f0; border-radius: 4px;">
+                                                        <% 
+                                                            const capacity = Number(supervisor.session_capacity) || 0;
+                                                            const assigned = Number(supervisor.assigned_count) || 0;
+                                                            const percentage = capacity > 0 ? Math.min(100, (assigned / capacity) * 100) : 0;
+                                                        %>
+                                                        <div class="progress-bar bg-primary" style="width: <%= percentage %>%; border-radius: 4px;"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selected Preferences List -->
+            <div class="col-lg-5">
+                <div class="card premium-card border h-100 mb-0 d-flex flex-column">
+                    <div class="card-header bg-transparent border-bottom pt-4 pb-3 px-4 bg-light">
+                        <h5 class="fw-bolder text-dark mb-0"><i class="bi bi-sort-numeric-down text-success me-2"></i> My Preference List</h5>
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                        <p class="text-secondary small mb-3">
+                            Use the up/down buttons to reorder your selected rank hierarchy.
+                        </p>
+
+                        <div id="preferenceList" class="flex-grow-1 mb-3">
+                            <% if (preferences.length === 0) { %>
+                                <div id="emptyPreferenceMessage" class="text-center text-muted py-5 border border-dashed rounded-4 p-4 bg-light">
+                                    <i class="bi bi-list-ul display-4 text-secondary opacity-50 d-block mb-2"></i>
+                                    <span class="small fw-semibold">No supervisors selected yet.<br>Select supervisors from the left panel.</span>
+                                </div>
+                            <% } else { %>
+                                <% preferences.forEach((preference, index) => { %>
+                                    <div class="preference-item d-flex align-items-center justify-content-between shadow-sm" data-id="<%= preference.supervisor_id %>">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="priority-number"><%= index + 1 %></div>
+                                            <div>
+                                                <div class="fw-bold text-dark"><%= preference.name %></div>
+                                                <small class="text-secondary font-monospace"><%= preference.supervisor_code %></small>
+                                            </div>
+                                        </div>
+                                        <% if (!preferencesLocked) { %>
+                                            <div class="btn-group btn-group-sm shadow-sm">
+                                                <button type="button" class="btn btn-outline-secondary move-up bg-white" title="Move up"><i class="bi bi-chevron-up"></i></button>
+                                                <button type="button" class="btn btn-outline-secondary move-down bg-white" title="Move down"><i class="bi bi-chevron-down"></i></button>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+
+                        <% if (!preferencesLocked) { %>
+                            <button type="submit" class="btn btn-copper btn-action w-100 mt-auto" id="savePreferencesBtn">
+                                <i class="bi bi-save-fill me-2"></i> Save Preference List
+                            </button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- Instructions Footer Card -->
+    <div class="card premium-card border mt-4">
+        <div class="card-body p-4">
+            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle me-2" style="color:var(--sp-copper)"></i>How supervisor preferences work</h6>
+            <div class="how-it-works">
+                <div class="how-step"><span class="how-step-number">STEP 01</span><strong>Select faculty</strong>Choose the supervisors you would like to work with from the available roster.</div>
+                <div class="how-step"><span class="how-step-number">STEP 02</span><strong>Set your order</strong>Use the arrow controls to rank your choices. Priority 1 is your first choice.</div>
+                <div class="how-step"><span class="how-step-number">STEP 03</span><strong>Save your list</strong>Submit the ordered list so it can be considered during the allocation run.</div>
+                <div class="how-step"><span class="how-step-number">STEP 04</span><strong>Understand the limits</strong>Final assignments remain subject to faculty capacity constraints.</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.supervisor-checkbox');
+    const preferenceList = document.getElementById('preferenceList');
+
+    function updatePreferenceList() {
+        const selected = Array.from(checkboxes).filter(cb => cb.checked);
+        preferenceList.querySelectorAll('.preference-item').forEach(item => item.remove());
+        const emptyMessage = document.getElementById('emptyPreferenceMessage');
+
+        if (selected.length === 0) {
+            if (!emptyMessage) {
+                preferenceList.innerHTML = `
+                    <div id="emptyPreferenceMessage" class="text-center text-muted py-5 border border-dashed rounded-4 p-4 bg-light">
+                        <i class="bi bi-list-ul display-4 text-secondary opacity-50 d-block mb-2"></i>
+                        <span class="small fw-semibold">No supervisors selected yet.<br>Select supervisors from the left panel.</span>
+                    </div>
+                `;
+            }
+            return;
+        }
+
+        if (emptyMessage) emptyMessage.remove();
+
+        selected.forEach((checkbox, index) => {
+            const item = document.createElement('div');
+            item.className = 'preference-item d-flex align-items-center justify-content-between shadow-sm';
+            item.dataset.id = checkbox.value;
+            item.innerHTML = `
+                <div class="d-flex align-items-center gap-3">
+                    <div class="priority-number">${index + 1}</div>
+                    <div>
+                        <div class="fw-bold text-dark">${checkbox.dataset.name}</div>
+                    </div>
+                </div>
+                <div class="btn-group btn-group-sm shadow-sm">
+                    <button type="button" class="btn btn-outline-secondary move-up bg-white"><i class="bi bi-chevron-up"></i></button>
+                    <button type="button" class="btn btn-outline-secondary move-down bg-white"><i class="bi bi-chevron-down"></i></button>
+                </div>
+            `;
+            preferenceList.appendChild(item);
+        });
+        attachMoveButtons();
+    }
+
+    function attachMoveButtons() {
+        document.querySelectorAll('.move-up').forEach(btn => {
+            btn.onclick = function () {
+                const item = this.closest('.preference-item');
+                const prev = item.previousElementSibling;
+                if (prev && prev.classList.contains('preference-item')) {
+                    preferenceList.insertBefore(item, prev);
+                    refreshPriorities();
+                }
+            };
+        });
+        document.querySelectorAll('.move-down').forEach(btn => {
+            btn.onclick = function () {
+                const item = this.closest('.preference-item');
+                const next = item.nextElementSibling;
+                if (next && next.classList.contains('preference-item')) {
+                    preferenceList.insertBefore(next, item);
+                    refreshPriorities();
+                }
+            };
+        });
+    }
+
+    function refreshPriorities() {
+        document.querySelectorAll('.preference-item').forEach((item, index) => {
+            const num = item.querySelector('.priority-number');
+            if (num) num.textContent = index + 1;
+        });
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updatePreferenceList));
+
+    const form = document.getElementById('preferenceForm');
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const items = preferenceList.querySelectorAll('.preference-item');
+        if (items.length === 0) {
+            alert('Please select at least one supervisor.');
+            return;
+        }
+
+        // Disable original table checkboxes so they don't conflict with our ordered list inputs
+        checkboxes.forEach(cb => cb.disabled = true);
+
+        // Remove any old dynamically generated inputs to prevent duplicates
+        form.querySelectorAll('.generated-preference-input').forEach(i => i.remove());
+
+        // Append hidden inputs in exact ranked order
+        items.forEach(item => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'supervisor_ids';
+            input.value = item.dataset.id;
+            input.className = 'generated-preference-input';
+            form.appendChild(input);
+        });
+        form.submit();
+    });
+
+    attachMoveButtons();
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,195 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid tp-main-content py-4 px-md-4" style="max-width: 1400px;">
+    
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bolder tp-text-main mb-1" style="letter-spacing: -0.5px;">Global Students</h2>
+            <p class="tp-text-muted mb-0">View, edit, and audit system-wide enrollments[cite: 8].</p>
+        </div>
+        <div>
+            <a href="/admin/dashboard" class="btn tp-btn-surface shadow-sm d-flex align-items-center">
+                <i class="bi bi-arrow-left me-2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    <!-- <% if (typeof successMsg !== 'undefined' && successMsg && successMsg.length > 0) { %>
+        <div class="alert tp-alert-success border-0 shadow-sm rounded-3"><i class="bi bi-check-circle-fill me-2"></i><%= successMsg %></div>
+    <% } %>
+    <% if (typeof errorMsg !== 'undefined' && errorMsg && errorMsg.length > 0) { %>
+        <div class="alert tp-alert-danger border-0 shadow-sm rounded-3"><i class="bi bi-exclamation-triangle-fill me-2"></i><%= errorMsg %></div>
+    <% } %> -->
+
+    <!-- Filter Bar -->
+    <div class="tp-card mb-4 p-3">
+        <form action="/admin/students" method="GET" class="row gx-3 align-items-center m-0">
+            <div class="col-auto">
+                <label class="fw-bold tp-text-muted mb-0"><i class="bi bi-funnel me-1"></i> Filter:</label>
+            </div>
+            <div class="col-md-4">
+                <select name="department_id" class="form-select tp-form-control py-2" onchange="this.form.submit()">
+                    <option value="" style="background: var(--bg-base); color: var(--text-main);">All Departments</option>
+                    <% departments.forEach(dept => { %>
+                        <option value="<%= dept.id %>" <%= filters.department_id == dept.id ? 'selected' : '' %> style="background: var(--bg-base); color: var(--text-main);"><%= dept.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="col-md-4 mt-2 mt-md-0">
+                <select name="session_id" class="form-select tp-form-control py-2" onchange="this.form.submit()">
+                    <option value="" style="background: var(--bg-base); color: var(--text-main);">All Sessions</option>
+                    <% sessions.forEach(session => { %>
+                        <option value="<%= session.id %>" <%= filters.session_id == session.id ? 'selected' : '' %> style="background: var(--bg-base); color: var(--text-main);"><%= session.session_name %></option>
+                    <% }) %>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="tp-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table tp-table tp-table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3">Student Profile</th>
+                        <th class="px-4 py-3">Session</th>
+                        <th class="px-4 py-3">Department</th>
+                        <th class="px-4 py-3">Account</th>
+                        <th class="px-4 py-3 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (typeof students !== 'undefined' && students && students.length > 0) { %>
+                        <% students.forEach(student => { %>
+                            <tr>
+                                <td class="px-4 py-3">
+                                    <div class="fw-bold tp-text-main"><%= student.name %></div>
+                                    <div class="tp-text-muted small mt-1">ID: <%= student.student_id %> | <%= student.email %></div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="tp-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-color);"><%= student.session_name %></span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="tp-badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-color);"><%= student.department_name %></span>
+                                </td>
+                                
+                                <!-- Status Column -->
+                                <td class="px-4 py-3">
+                                    <% if (student.account_status === 'active') { %>
+                                        <span class="tp-badge tp-badge-success">Active</span>
+                                    <% } else { %>
+                                        <span class="tp-badge tp-badge-danger">Archived</span>
+                                    <% } %>
+                                </td>
+
+                                <!-- Actions Column -->
+                                <td class="px-4 py-3 text-end">
+                                    <% if (student.account_status !== 'active') { %>
+                                        <!-- Reactivate Button -->
+                                        <form action="/admin/users/<%= student.user_id %>/reactivate" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm tp-btn-surface text-success me-1" onclick="return confirm('Reactivate this student account?');">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Reactivate
+                                            </button>
+                                        </form>
+
+                                        <!-- Hard Delete Button -->
+                                        <form action="/admin/users/<%= student.user_id %>/hard-delete" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm tp-btn-outline-danger" onclick="return confirm('WARNING: This will permanently wipe this student and their profile from the database. This cannot be undone. Continue?');">
+                                                <i class="bi bi-trash3-fill"></i> Hard Delete
+                                            </button>
+                                        </form>
+                                    <% } else { %>
+                                        <!-- Standard Active Actions -->
+                                        <button class="btn btn-sm tp-btn-surface me-1" data-bs-toggle="modal" data-bs-target="#editModal-<%= student.id %>">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </button>
+                                        
+                                        <!-- Archive Toggle -->
+                                        <form action="/admin/students/<%= student.id %>/delete" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm tp-btn-surface text-warning" onclick="return confirm('Archive this student account? They will not be able to log in.');">
+                                                <i class="bi bi-archive"></i> Archive
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="bi bi-mortarboard display-4 tp-text-muted mb-3 d-block opacity-50"></i>
+                                <h5 class="fw-bold tp-text-main">No Students Found</h5>
+                                <p class="tp-text-muted">Try adjusting your filters to see more results.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODALS PLACED SAFELY AT THE BOTTOM OF PAGE -->
+<!-- ========================================== -->
+
+<!-- Edit Modals Loop -->
+<% if (typeof students !== 'undefined' && students && students.length > 0) { %>
+    <% students.forEach(student => { %>
+        <!-- Edit Modal -->
+        <div class="modal fade text-start" id="editModal-<%= student.id %>" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content tp-card border-0 shadow-lg p-0">
+                    <div class="modal-header border-bottom-0 pb-2 pt-4 px-4">
+                        <h5 class="fw-bolder tp-text-main mb-0">Edit Student Record</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/admin/students/<%= student.id %>/update" method="POST">
+                        <div class="modal-body px-4 py-3">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold tp-text-muted small text-uppercase">Full Name</label>
+                                <input type="text" name="name" class="form-control tp-form-control py-2.5" value="<%= student.name %>" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Email</label>
+                                    <input type="email" name="email" class="form-control tp-form-control py-2.5" value="<%= student.email %>" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Student ID</label>
+                                    <input type="text" name="student_id" class="form-control tp-form-control py-2.5" value="<%= student.student_id %>" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Department</label>
+                                    <select name="department_id" class="form-select tp-form-control py-2.5" required>
+                                        <% departments.forEach(dept => { %>
+                                            <option value="<%= dept.id %>" <%= dept.name === student.department_name ? 'selected' : '' %> style="background: var(--bg-base); color: var(--text-main);"><%= dept.name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold tp-text-muted small text-uppercase">Session</label>
+                                    <select name="session_id" class="form-select tp-form-control py-2.5" required>
+                                        <% sessions.forEach(session => { %>
+                                            <option value="<%= session.id %>" <%= session.session_name === student.session_name ? 'selected' : '' %> style="background: var(--bg-base); color: var(--text-main);"><%= session.session_name %></option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                            <button type="submit" class="btn tp-btn-accent w-100 py-2">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+<% } %>
+
+<%- include('../partials/footer') %>

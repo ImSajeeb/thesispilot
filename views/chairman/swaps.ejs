@@ -1,0 +1,86 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="/css/chairman-swaps.css">
+
+<main class="chairman-swaps-page">
+  <section class="swaps-heading">
+    <div class="swaps-heading-copy">
+      <div class="swaps-eyebrow"><span class="swaps-eyebrow-mark"></span> GOVERNANCE / STUDENT MOVEMENT</div>
+      <h1>Transfer approvals</h1>
+      <p>Review supervisor-initiated transfers and make the final allocation decision.</p>
+    </div>
+    <a href="/chairman/dashboard" class="swaps-back-link"><i class="bi bi-arrow-left"></i><span>Back to dashboard</span></a>
+  </section>
+
+  <section class="swaps-filter-panel" aria-label="Transfer request filters">
+    <div class="swaps-filter-intro">
+      <span class="swaps-icon-tile"><i class="bi bi-sliders2"></i></span>
+      <div><h2>Review scope</h2><p>Select the academic session you want to review.</p></div>
+    </div>
+    <form method="GET" action="/chairman/swaps" class="swaps-session-form">
+      <label for="swaps-session">Academic session</label>
+      <select id="swaps-session" name="session_id" class="form-select" onchange="this.form.submit()">
+        <% sessions.forEach(session => { %>
+          <option value="<%= session.id %>" <%= Number(selectedSessionId) === Number(session.id) ? 'selected' : '' %>>
+            <%= session.session_name %><%= session.status === 'active' ? ' [Active]' : '' %>
+          </option>
+        <% }) %>
+      </select>
+      <span class="swaps-filter-hint"><i class="bi bi-arrow-repeat"></i> Changing the session refreshes this list.</span>
+    </form>
+  </section>
+
+  <section class="swaps-requests-panel">
+    <header class="swaps-panel-header">
+      <div class="swaps-panel-title">
+        <span class="swaps-icon-tile swaps-icon-tile--small"><i class="bi bi-arrow-left-right"></i></span>
+        <div><h2>Pending transfers</h2><p>Requests accepted by the receiving supervisor, awaiting your final decision.</p></div>
+      </div>
+      <div class="swaps-count"><span class="swaps-count-dot"></span><strong><%= swapRequests.length %></strong><span>awaiting review</span></div>
+    </header>
+
+    <% if (swapRequests.length === 0) { %>
+      <div class="swaps-empty-state">
+        <span class="swaps-empty-icon"><i class="bi bi-check2-circle"></i></span>
+        <h3>You're all caught up</h3>
+        <p>There are no transfer requests awaiting approval for the selected session.</p>
+      </div>
+    <% } else { %>
+      <div class="swaps-table-wrap">
+        <table class="table swaps-table">
+          <thead><tr>
+            <th scope="col">Current supervisor</th>
+            <th scope="col">Student</th>
+            <th scope="col">Receiving supervisor</th>
+            <th scope="col" class="swaps-reason-column">Transfer reason</th>
+            <th scope="col" class="swaps-decision-column">Decision</th>
+          </tr></thead>
+          <tbody>
+            <% swapRequests.forEach(swap => { %>
+              <tr>
+                <td>
+                  <div class="swaps-person"><span class="swaps-avatar"><i class="bi bi-person-workspace"></i></span><div><strong><%= swap.current_supervisor_name %></strong><span class="swaps-subline">Current supervisor</span></div></div>
+                </td>
+                <td>
+                  <div class="swaps-person swaps-student"><span class="swaps-avatar swaps-avatar--student"><i class="bi bi-mortarboard"></i></span><div><strong><%= swap.student_name %></strong><span class="swaps-subline swaps-student-id">ID · <%= swap.student_code %></span></div></div>
+                </td>
+                <td>
+                  <div class="swaps-person"><span class="swaps-avatar swaps-avatar--receiver"><i class="bi bi-person-check"></i></span><div><strong><%= swap.requested_supervisor_name %></strong><span class="swaps-status"><i class="bi bi-check2"></i> Request accepted</span></div></div>
+                </td>
+                <td><div class="swaps-reason"><%= swap.reason %></div></td>
+                <td class="swaps-decision-cell">
+                  <form action="/chairman/swaps/decide" method="POST" class="swaps-decision-form">
+                    <input type="hidden" name="swap_id" value="<%= swap.id %>">
+                    <button type="submit" name="decision" value="approve" class="swaps-button swaps-button--approve" onclick="return confirm('Approve this transfer? The student will be reassigned immediately.');"><i class="bi bi-check2"></i> Approve</button>
+                    <button type="submit" name="decision" value="reject" class="swaps-button swaps-button--reject" onclick="return confirm('Reject this transfer? The student will stay with their current supervisor.');"><i class="bi bi-x-lg"></i> Reject</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <footer class="swaps-panel-footer"><i class="bi bi-shield-check"></i><span>Review the student, both supervisors, and the stated reason before confirming a decision.</span></footer>
+    <% } %>
+  </section>
+</main>
+<%- include('../partials/footer') %>

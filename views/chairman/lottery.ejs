@@ -1,0 +1,133 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="/css/lottery.css">
+
+<main class="lottery-page container-fluid py-4 px-3 px-lg-4">
+    <header class="lottery-page-header">
+        <div class="lottery-heading">
+            <span class="lottery-eyebrow"><i class="bi bi-diagram-3"></i> ALLOCATION MANAGEMENT</span>
+            <h1>Allocation Lottery</h1>
+            <p>Review pending thesis submissions and supervisor capacity before running the allocation process.</p>
+        </div>
+        <a href="/chairman/dashboard" class="lottery-back-link">
+            <i class="bi bi-arrow-left"></i><span>Dashboard</span>
+        </a>
+    </header>
+
+    <section class="lottery-action-panel" aria-labelledby="lottery-action-title">
+        <div class="lottery-action-mark"><i class="bi bi-shuffle"></i></div>
+        <div class="lottery-action-copy">
+            <span class="lottery-eyebrow">AUTOMATED PROCESS</span>
+            <h2 id="lottery-action-title">Thesis supervisor allocation</h2>
+            <p>
+                The algorithm considers student preferences first, then assigns remaining students
+                to supervisors with available capacity. Review the queues below before proceeding.
+            </p>
+            <div class="lottery-action-meta">
+                <span class="lottery-pending-count"><strong><%= pendingTheses.length %></strong> pending <%= pendingTheses.length === 1 ? 'student' : 'students' %></span>
+                <span class="lottery-meta-divider"></span>
+                <span><i class="bi bi-shield-check"></i> Capacity-aware assignment</span>
+            </div>
+        </div>
+        <div class="lottery-action-control">
+            <% if (pendingTheses.length > 0) { %>
+                <form action="/chairman/lottery/run" method="POST" onsubmit="return confirm('Are you sure you want to run the allocation algorithm? This will assign supervisors to all pending students.');">
+                    <button type="submit" class="lottery-run-button">
+                        <i class="bi bi-play-fill"></i> Run allocation
+                    </button>
+                </form>
+                <small><i class="bi bi-exclamation-circle"></i> This will assign all pending students.</small>
+            <% } else { %>
+                <button type="button" class="lottery-run-button lottery-run-button-disabled" disabled>
+                    <i class="bi bi-check2-circle"></i> Queue is clear
+                </button>
+                <small>There are no pending students to allocate.</small>
+            <% } %>
+        </div>
+    </section>
+
+    <section class="lottery-data-grid">
+        <article class="lottery-panel">
+            <div class="lottery-panel-header">
+                <div class="lottery-panel-icon lottery-icon-pending"><i class="bi bi-hourglass-split"></i></div>
+                <div class="lottery-panel-title">
+                    <h2>Students waiting</h2>
+                    <p>Thesis submissions awaiting supervisor assignment</p>
+                </div>
+                <span class="lottery-count-badge"><%= pendingTheses.length %></span>
+            </div>
+            <div class="lottery-table-wrap">
+                <table class="lottery-table">
+                    <thead>
+                        <tr><th>Student</th><th>Thesis title</th></tr>
+                    </thead>
+                    <tbody>
+                        <% if (pendingTheses.length === 0) { %>
+                            <tr><td colspan="2" class="lottery-empty-cell">
+                                <i class="bi bi-check2-circle"></i>
+                                <strong>No pending students</strong>
+                                <span>All current thesis submissions have been allocated.</span>
+                            </td></tr>
+                        <% } else { %>
+                            <% pendingTheses.forEach(t => { %>
+                                <tr>
+                                    <td class="lottery-student-name"><%= t.name %></td>
+                                    <td class="lottery-thesis-title"><%= t.title %></td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <footer class="lottery-panel-footer">
+                <i class="bi bi-info-circle"></i> Pending students are included in the next lottery run.
+            </footer>
+        </article>
+
+        <article class="lottery-panel">
+            <div class="lottery-panel-header">
+                <div class="lottery-panel-icon lottery-icon-capacity"><i class="bi bi-people"></i></div>
+                <div class="lottery-panel-title">
+                    <h2>Supervisor capacity</h2>
+                    <p>Current assignments against each supervisor's limit</p>
+                </div>
+                <span class="lottery-count-badge"><%= supervisors.length %></span>
+            </div>
+            <div class="lottery-table-wrap">
+                <table class="lottery-table lottery-supervisor-table">
+                    <thead>
+                        <tr><th>Supervisor</th><th>Current</th><th>Limit</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <% if (supervisors.length === 0) { %>
+                            <tr><td colspan="4" class="lottery-empty-cell">
+                                <i class="bi bi-person-exclamation"></i>
+                                <strong>No supervisors found</strong>
+                                <span>Add supervisors and configure their capacity first.</span>
+                            </td></tr>
+                        <% } else { %>
+                            <% supervisors.forEach(sup => { %>
+                                <tr>
+                                    <td class="lottery-student-name"><%= sup.name %></td>
+                                    <td><span class="lottery-number"><%= sup.current_count %></span></td>
+                                    <td><span class="lottery-number lottery-number-muted"><%= sup.max_students %></span></td>
+                                    <td>
+                                        <% if (sup.current_count >= sup.max_students) { %>
+                                            <span class="lottery-status lottery-status-full">Full</span>
+                                        <% } else { %>
+                                            <span class="lottery-status lottery-status-open"><%= sup.max_students - sup.current_count %> <%= (sup.max_students - sup.current_count) === 1 ? 'slot' : 'slots' %> left</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <footer class="lottery-panel-footer">
+                <i class="bi bi-info-circle"></i> Supervisors marked Full are not available for additional assignments.
+            </footer>
+        </article>
+    </section>
+</main>
+
+<%- include('../partials/footer') %>

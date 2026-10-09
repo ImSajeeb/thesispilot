@@ -1,0 +1,74 @@
+/* Stats Grid */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.admin-stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.admin-stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+/* Stat Icon Color Mapping (Neutral/Warm) */
+.stat-primary .admin-stat-icon { background: rgba(234, 88, 12, 0.15); color: var(--primary-color); }
+.stat-secondary .admin-stat-icon { background: rgba(217, 119, 6, 0.15); color: var(--secondary-color); }
+.stat-success .admin-stat-icon { background: rgba(22, 163, 74, 0.15); color: var(--success); }
+.stat-warning .admin-stat-icon { background: rgba(202, 138, 4, 0.15); color: var(--warning); }
+.stat-light .admin-stat-icon { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
+
+
+/* Modules Grid */
+.admin-module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Module Links (Interactive List Items) */
+.admin-module-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.admin-module-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color) inset;
+}
+
+.admin-module-link:hover .bi-chevron-right {
+    color: var(--primary-color) !important;
+    transform: translateX(3px);
+}
+
+.admin-module-link .bi-chevron-right {
+    transition: transform 0.2s ease, color 0.2s ease;
+}

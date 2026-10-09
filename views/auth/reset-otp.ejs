@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+
+<style>
+    .otp-input { 
+        letter-spacing: 0.5rem; 
+        font-size: 1.5rem; 
+        text-align: center; 
+    }
+</style>
+
+<div class="container tp-auth-wrapper py-5">
+    <div class="tp-card w-100 mx-auto" style="max-width: 450px;">
+        <div class="card-body p-4 p-md-5">
+            
+            <div class="text-center mb-4">
+                <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" 
+                     style="width: 60px; height: 60px; font-size: 1.5rem; background: rgba(234, 88, 12, 0.1); color: var(--primary-color);">
+                    <i class="bi bi-envelope-open-fill"></i>
+                </div>
+                <h3 class="fw-bolder tp-text-main">Verify OTP</h3>
+                <p class="tp-text-muted small">Code sent to <br><strong class="tp-text-main"><%= email %></strong></p>
+            </div>
+
+            <!-- Flash Messages (Commented out to avoid double rendering with header.ejs) -->
+            <% /* %>
+            <% if (typeof successMsg !== 'undefined' && successMsg && successMsg.length > 0) { %> 
+                <div class="alert tp-alert-success border-0 shadow-sm rounded-4 mb-3 py-2 small"><%= successMsg %></div> 
+            <% } %>
+            <% if (typeof errorMsg !== 'undefined' && errorMsg && errorMsg.length > 0) { %> 
+                <div class="alert tp-alert-danger border-0 shadow-sm rounded-4 mb-3 py-2 small"><%= errorMsg %></div> 
+            <% } %>
+            <% */ %>
+
+            <form action="/auth/reset-otp" method="POST" autocomplete="off">
+                <div class="mb-4">
+                    <input type="text" class="form-control tp-form-control py-3 fw-bold otp-input" name="otp" required maxlength="6" pattern="\d{6}" placeholder="------" autofocus>
+                </div>
+                <button type="submit" class="btn tp-btn-accent w-100 shadow mb-3 py-2.5 fw-bold">Verify Code</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

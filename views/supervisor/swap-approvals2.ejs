@@ -1,0 +1,152 @@
+<%- include('../partials/header') %>
+<link rel="stylesheet" href="/css/supervisor-swap-approvals.css">
+
+<main class="swap-approvals-page">
+<div class="swap-approvals-shell">
+    
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <div class="swap-page-kicker">SUPERVISOR WORKSPACE</div>
+            <h2 class="swap-page-title">Swap &amp; Transfer Approvals</h2>
+            <p class="swap-page-subtitle">Track requests you have sent and review transfer or mutual-swap requests awaiting your decision.</p>
+        </div>
+        <div>
+            <a href="/supervisor/dashboard" class="btn swap-back-link"><i class="bi bi-arrow-left me-2"></i>Dashboard</a>
+        </div>
+    </div>
+
+    <% if (successMsg && successMsg.length > 0) { %>
+        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4"><%= successMsg %></div>
+    <% } %>
+
+    <!-- Quick Search Filter Box -->
+    <section class="swap-search-panel">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light border-0 text-secondary"><i class="bi bi-search"></i></span>
+            <input type="text" id="swapSearchInput" class="form-control border-0 bg-light shadow-sm ps-0" placeholder="Filter requests by student name or supervisor...">
+        </div>
+    </section>
+
+    <div class="swap-overview-grid">
+        <div class="swap-overview-item"><span class="swap-overview-icon outgoing"><i class="bi bi-box-arrow-up-right"></i></span><div><span class="swap-overview-label">Outgoing requests</span><strong><%= outgoingRequests.length %></strong><small>Requests you initiated</small></div></div>
+        <div class="swap-overview-item"><span class="swap-overview-icon incoming"><i class="bi bi-inbox"></i></span><div><span class="swap-overview-label">Incoming requests</span><strong><%= incomingRequests.length %></strong><small>Awaiting your review</small></div></div>
+    </div>
+
+    <!-- OUTGOING REQUESTS TRACKER -->
+    <section class="swap-request-panel outgoing-panel">
+        <div class="swap-panel-header">
+            <div><div class="swap-panel-kicker">REQUEST TRACKER</div><h5 class="swap-panel-title"><i class="bi bi-box-arrow-right me-2"></i>Outgoing requests</h5><p class="swap-panel-description">Monitor the progress of requests submitted by you.</p></div>
+            <span class="swap-count-badge"><%= outgoingRequests.length %> active</span>
+        </div>
+        <div class="table-responsive">
+            <% if (outgoingRequests.length === 0) { %>
+                <div class="swap-empty-state"><span class="swap-empty-icon"><i class="bi bi-send"></i></span><strong>No outgoing requests</strong><p>You have no active transfer requests to track.</p></div>
+            <% } else { %>
+                <table class="table swap-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Student</th>
+                            <th>Target Supervisor</th>
+                            <th>Reason</th>
+                            <th>Status Tracking</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% outgoingRequests.forEach(req => { %>
+                            <tr>
+                                <td class="student-name-cell"><strong><%= req.student_name %></strong></td>
+                                <td><span class="swap-person-chip"><i class="bi bi-person-check me-1"></i><%= req.requested_supervisor_name %></span></td>
+                                <td><span class="swap-reason"><%= req.reason %></span></td>
+                                <td>
+                                    <% if (req.status === 'pending_requested_supervisor') { %>
+                                        <span class="swap-status waiting-faculty"><span></span>Awaiting receiving faculty</span>
+                                    <% } else if (req.status === 'pending_chairman') { %>
+                                        <span class="swap-status waiting-chairman"><span></span>Awaiting chairman sign-off</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="/supervisor/swap-approvals/cancel" method="POST" class="d-inline">
+                                        <input type="hidden" name="swap_id" value="<%= req.id %>">
+                                        <button type="submit" class="btn swap-action-btn cancel-btn" onclick="return confirm('Are you sure you want to cancel and delete this transfer request?');">
+                                            <i class="bi bi-x-circle me-1"></i>Cancel
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </section>
+    
+    <!-- INCOMING REQUESTS -->
+    <section class="swap-request-panel incoming-panel">
+        <div class="swap-panel-header">
+            <div><div class="swap-panel-kicker">ACTION REQUIRED</div><h5 class="swap-panel-title"><i class="bi bi-box-arrow-in-down-left me-2"></i>Incoming requests</h5><p class="swap-panel-description">Review requests from other supervisors and make a decision.</p></div>
+            <span class="swap-count-badge incoming-count"><%= incomingRequests.length %> pending</span>
+        </div>
+        <div class="table-responsive">
+            <% if (incomingRequests.length === 0) { %>
+                <div class="swap-empty-state"><span class="swap-empty-icon"><i class="bi bi-inbox"></i></span><strong>No incoming requests</strong><p>There are no transfer or swap requests waiting for your decision.</p></div>
+            <% } else { %>
+                <table class="table swap-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Incoming Student</th>
+                            <th>Request Type</th>
+                            <th>Current Supervisor</th>
+                            <th>Reason</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% incomingRequests.forEach(req => { %>
+                            <tr>
+                                <td class="student-name-cell"><strong><%= req.student_name %></strong></td>
+                                <td>
+                                    <% if (req.target_student_id) { %>
+                                        <span class="swap-type-chip mutual-type">Mutual swap</span>
+                                        <div class="text-secondary small mt-1">Trading for: <%= req.target_student_name %></div>
+                                    <% } else { %>
+                                        <span class="swap-type-chip transfer-type">Transfer</span>
+                                    <% } %>
+                                </td>
+                                <td><span class="swap-person-chip"><i class="bi bi-person me-1"></i><%= req.current_supervisor_name %></span></td>
+                                <td><span class="swap-reason"><%= req.reason %></span></td>
+                                <td class="text-end pe-4">
+                                    <form action="/supervisor/swap-approvals/decide" method="POST" class="d-inline">
+                                        <input type="hidden" name="swap_id" value="<%= req.id %>">
+                                        <input type="hidden" name="current_stage" value="pending_requested_supervisor">
+                                        <button type="submit" name="decision" value="approve" class="btn swap-action-btn accept-btn me-1" onclick="return confirm('Accept this incoming student request? This will forward it to the Chairman for final sign-off.');">Accept</button>
+                                        <button type="submit" name="decision" value="reject" class="btn swap-action-btn reject-btn" onclick="return confirm('Reject this request?');">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </section>
+</div>
+</main>
+
+<%- include('../partials/footer') %>
+
+<script>
+    document.getElementById('swapSearchInput').addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase();
+        const tables = document.querySelectorAll('table');
+        
+        tables.forEach(table => {
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    });
+</script>

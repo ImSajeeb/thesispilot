@@ -1,0 +1,190 @@
+/* ThesisPilot — Chairman / Student Roster
+   Scoped to this page so the shared application shell is unaffected. */
+.chairman-students-page {
+  --students-bg: #111214;
+  --students-surface: #191a1d;
+  --students-surface-raised: #202125;
+  --students-line: #303136;
+  --students-text: #f2f0ed;
+  --students-muted: #a5a3a0;
+  --students-copper: #d99063;
+  --students-copper-bright: #f0a574;
+  --students-copper-wash: rgba(217, 144, 99, .12);
+  --students-red: #e17b79;
+  --students-amber: #e3bd77;
+  max-width: 1540px;
+  margin-inline: auto;
+  color: var(--students-text);
+}
+.chairman-students-page * { box-sizing: border-box; }
+.chairman-students-page .students-page-header { padding: 0 2px; }
+.chairman-students-page .students-eyebrow {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 15px;
+  color: #b7a99f; font-size: .68rem; font-weight: 800; letter-spacing: .16em;
+}
+.chairman-students-page .students-eyebrow-mark { width: 7px; height: 7px; border-radius: 2px; background: var(--students-copper); box-shadow: 0 0 0 4px rgba(217,144,99,.1); }
+.chairman-students-page .students-eyebrow-divider { color: #5d5651; }
+.chairman-students-page .students-page-title {
+  margin: 0; color: #f7f4f1; font-size: clamp(2.05rem, 4vw, 3.15rem); line-height: 1.04;
+  font-weight: 760; letter-spacing: -.055em;
+}
+.chairman-students-page .students-page-title span { color: var(--students-copper); }
+.chairman-students-page .students-page-subtitle { margin: 13px 0 0; color: var(--students-muted); font-size: .96rem; line-height: 1.65; max-width: 670px; }
+.chairman-students-page .students-header-actions { align-items: center; }
+.chairman-students-page .students-btn {
+  display: inline-flex; justify-content: center; align-items: center; gap: 5px; min-height: 42px;
+  border-radius: 9px; padding: 10px 14px; font-size: .83rem; font-weight: 700; line-height: 1.2;
+  transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+.chairman-students-page .students-btn:hover { transform: translateY(-1px); }
+.chairman-students-page .students-btn-primary { color: #1a1410; background: var(--students-copper); border: 1px solid var(--students-copper); }
+.chairman-students-page .students-btn-primary:hover, .chairman-students-page .students-btn-primary:focus { color: #17110d; background: var(--students-copper-bright); border-color: var(--students-copper-bright); }
+.chairman-students-page .students-btn-outline { color: #e4d0c3; background: rgba(217,144,99,.06); border: 1px solid #73513e; }
+.chairman-students-page .students-btn-outline:hover { color: #fff0e5; background: var(--students-copper-wash); border-color: var(--students-copper); }
+.chairman-students-page .students-btn-quiet { color: #d0cdca; background: #1b1c1f; border: 1px solid #38393e; }
+.chairman-students-page .students-btn-quiet:hover { color: #fff; background: #25262a; border-color: #55565b; }
+.chairman-students-page .btn-action { border-radius: 9px; font-size: .82rem; font-weight: 700; padding: 10px 13px; box-shadow: none !important; }
+
+/* Filter panel */
+.chairman-students-page .students-filter-panel,
+.chairman-students-page .students-roster-panel {
+  overflow: hidden; border: 1px solid var(--students-line); border-radius: 15px;
+  background: linear-gradient(145deg, rgba(29,30,33,.98), rgba(22,23,25,.99));
+  box-shadow: 0 12px 32px rgba(0,0,0,.12);
+}
+.chairman-students-page .students-filter-panel { padding: 22px 23px 23px; }
+.chairman-students-page .students-panel-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 19px; }
+.chairman-students-page .students-panel-icon { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border-radius: 10px; color: var(--students-copper); background: var(--students-copper-wash); border: 1px solid rgba(217,144,99,.18); }
+.chairman-students-page .students-panel-heading h2 { margin: 0; color: #f0eeeb; font-size: .96rem; font-weight: 750; }
+.chairman-students-page .students-panel-heading p { margin: 4px 0 0; color: #93918f; font-size: .79rem; }
+.chairman-students-page .students-filter-grid { display: grid; grid-template-columns: minmax(220px, 1.55fr) minmax(145px, 1fr) minmax(155px, 1fr) minmax(175px, 1.15fr) auto; align-items: end; gap: 13px; }
+.chairman-students-page .students-filter-field { min-width: 0; }
+.chairman-students-page .students-filter-field > label { display: block; margin: 0 0 8px; color: #b9b6b2; font-size: .72rem; font-weight: 750; letter-spacing: .035em; }
+.chairman-students-page .students-filter-field .form-control,
+.chairman-students-page .students-filter-field .form-select {
+  width: 100%; min-height: 43px; padding: 10px 12px; border-radius: 8px; color: #ece9e6;
+  background-color: #131416; border: 1px solid #393a3f; box-shadow: none; font-size: .82rem;
+}
+.chairman-students-page .students-filter-field .form-select { padding-right: 32px; }
+.chairman-students-page .students-filter-field .form-control::placeholder { color: #777674; }
+.chairman-students-page .students-filter-field .form-control:focus,
+.chairman-students-page .students-filter-field .form-select:focus { border-color: var(--students-copper); box-shadow: 0 0 0 3px rgba(217,144,99,.11); }
+.chairman-students-page .students-filter-field .form-select option { color: #eee; background: #191a1d; }
+.chairman-students-page .students-search-control { position: relative; }
+.chairman-students-page .students-search-control > i { position: absolute; z-index: 2; left: 13px; top: 50%; color: #88837e; transform: translateY(-50%); pointer-events: none; }
+.chairman-students-page .students-search-control .form-control { padding-left: 37px; }
+.chairman-students-page .students-filter-actions { display: flex; gap: 7px; }
+.chairman-students-page .students-filter-actions .students-btn { min-height: 43px; white-space: nowrap; }
+
+/* Roster table */
+.chairman-students-page .students-roster-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 23px 24px 20px; border-bottom: 1px solid #303136; }
+.chairman-students-page .students-section-kicker { margin-bottom: 7px; color: var(--students-copper); font-size: .65rem; font-weight: 850; letter-spacing: .17em; }
+.chairman-students-page .students-roster-heading h2 { margin: 0; color: #f2efec; font-size: 1.15rem; font-weight: 760; letter-spacing: -.025em; }
+.chairman-students-page .students-roster-heading p { margin: 6px 0 0; color: #93918f; font-size: .8rem; }
+.chairman-students-page .students-roster-count { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; padding: 9px 12px; color: #b8b4b0; background: #151618; border: 1px solid #35363a; border-radius: 9px; font-size: .75rem; }
+.chairman-students-page .students-roster-count strong { color: #f2e6de; font-size: .92rem; }
+.chairman-students-page .students-roster-count .count-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--students-copper); }
+.chairman-students-page .students-table-wrap { overflow-x: auto; }
+.chairman-students-page .students-table { min-width: 950px; margin: 0; border-collapse: separate; border-spacing: 0; color: #dedbd7; }
+.chairman-students-page .students-table thead th { padding: 14px 20px; color: #8f8c89; background: #17181a; border-bottom: 1px solid #343539; font-size: .65rem; font-weight: 850; text-transform: uppercase; letter-spacing: .105em; white-space: nowrap; }
+.chairman-students-page .students-table thead th:first-child { padding-left: 24px; }
+.chairman-students-page .students-table tbody td { padding: 17px 20px; vertical-align: middle; background: transparent; border-bottom: 1px solid #2a2b2f; color: #d9d6d2; font-size: .82rem; }
+.chairman-students-page .students-table tbody td:first-child { padding-left: 24px; }
+.chairman-students-page .students-table tbody tr:last-child td { border-bottom: 0; }
+.chairman-students-page .students-table tbody tr { transition: background .15s ease; }
+.chairman-students-page .students-table tbody tr:hover td { background: rgba(255,255,255,.018); }
+.chairman-students-page .students-identity { display: flex; align-items: flex-start; gap: 12px; min-width: 260px; }
+.chairman-students-page .students-avatar { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px; border: 1px solid #594438; border-radius: 11px; background: linear-gradient(145deg, #35251d, #24201d); color: var(--students-copper); font-size: 1rem; }
+.chairman-students-page .students-identity-copy { min-width: 0; }
+.chairman-students-page .students-name { margin: 0 0 4px; color: #f0ede9; font-weight: 760; font-size: .86rem; line-height: 1.35; overflow-wrap: anywhere; }
+.chairman-students-page .students-id { color: #8e8b88; font-size: .7rem; }
+.chairman-students-page .students-id span { color: #c7c2bd; font-family: var(--bs-font-monospace); }
+.chairman-students-page .students-email { margin-top: 4px; color: #9e9a96; font-size: .73rem; overflow-wrap: anywhere; }
+.chairman-students-page .students-session-tag { display: inline-flex; align-items: center; padding: 6px 9px; border: 1px solid #4b4038; border-radius: 7px; color: #e0c4b0; background: rgba(217,144,99,.08); font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.chairman-students-page .students-status { display: inline-flex; align-items: center; margin-top: 9px; font-size: .71rem; font-weight: 700; white-space: nowrap; }
+.chairman-students-page .students-status-approved { color: var(--students-copper-bright); }
+.chairman-students-page .students-status-pending { color: var(--students-amber); }
+.chairman-students-page .students-status-rejected { color: var(--students-red); }
+.chairman-students-page .students-supervisor-name { color: #eee9e4; font-size: .82rem; font-weight: 730; line-height: 1.45; }
+.chairman-students-page .students-supervisor-name i { color: var(--students-copper); }
+.chairman-students-page .students-allocation-state { display: flex; align-items: center; gap: 7px; margin-top: 7px; color: #c4a58f; font-size: .7rem; }
+.chairman-students-page .students-allocation-state span { width: 6px; height: 6px; border-radius: 50%; background: var(--students-copper); }
+.chairman-students-page .students-unallocated { display: inline-flex; align-items: center; padding: 6px 8px; border: 1px solid rgba(227,189,119,.25); border-radius: 7px; color: var(--students-amber); background: rgba(227,189,119,.07); font-size: .71rem; font-weight: 700; white-space: nowrap; }
+.chairman-students-page .students-assign-btn { min-height: 35px; padding: 7px 10px; border: 1px solid #574438; border-radius: 8px; color: #e6c1a8; background: rgba(217,144,99,.07); font-size: .73rem; font-weight: 750; white-space: nowrap; }
+.chairman-students-page .students-assign-btn:hover { color: #fff0e5; background: rgba(217,144,99,.16); border-color: var(--students-copper); }
+.chairman-students-page .students-table .text-muted { color: #8b8885 !important; }
+.chairman-students-page .students-empty-state { display: flex; flex-direction: column; align-items: center; padding: 62px 20px 68px; text-align: center; }
+.chairman-students-page .students-empty-icon { display: grid; place-items: center; width: 62px; height: 62px; margin-bottom: 18px; border: 1px solid #3b3632; border-radius: 18px; color: var(--students-copper); background: #211c19; font-size: 1.45rem; }
+.chairman-students-page .students-empty-state h3 { margin: 0; color: #eeeae6; font-size: 1.03rem; font-weight: 750; }
+.chairman-students-page .students-empty-state p { max-width: 390px; margin: 9px 0 13px; color: #96928e; font-size: .83rem; line-height: 1.6; }
+
+/* Modals are rendered outside the page shell, so scope them by their own class. */
+.chairman-students-modal .modal-content { overflow: hidden; border: 1px solid #3b3b3f; border-radius: 16px; color: #eae6e2; background: #1b1c1f; box-shadow: 0 24px 80px rgba(0,0,0,.42); }
+.chairman-students-modal .modal-header, .chairman-students-modal .modal-footer { border-color: #333438 !important; }
+.chairman-students-modal .modal-header h5 { color: #f2eeea !important; font-weight: 760 !important; }
+.chairman-students-modal .btn-close { filter: invert(1) grayscale(1); opacity: .7; }
+.chairman-students-modal .modal-body { color: #c7c2bd; }
+.chairman-students-modal .form-label { color: #b9b3ad !important; letter-spacing: .045em; }
+.chairman-students-modal .form-control, .chairman-students-modal .form-select { min-height: 43px; border: 1px solid #3d3d42 !important; border-radius: 8px; color: #eee9e4 !important; background-color: #131416 !important; box-shadow: none !important; }
+.chairman-students-modal .form-control:focus, .chairman-students-modal .form-select:focus { border-color: var(--students-copper) !important; box-shadow: 0 0 0 3px rgba(217,144,99,.11) !important; }
+.chairman-students-modal .form-select option { color: #eee; background: #1b1c1f; }
+.chairman-students-modal .alert { border: 1px solid #554233 !important; color: #dfc5b3 !important; background: rgba(217,144,99,.09) !important; }
+.chairman-students-modal .alert-warning { border-color: #5d4b31 !important; color: #e4c994 !important; background: rgba(227,189,119,.08) !important; }
+.chairman-students-modal .alert code { color: #f0b48c; background: #27201c; padding: 2px 5px; border-radius: 4px; }
+.chairman-students-modal .text-secondary { color: #aaa49e !important; }
+.chairman-students-modal .students-btn { display: inline-flex; justify-content: center; align-items: center; min-height: 42px; border-radius: 9px; font-size: .84rem; font-weight: 750; }
+.chairman-students-modal .students-btn-primary { color: #1a1410; background: #d99063; border: 1px solid #d99063; }
+.chairman-students-modal .students-btn-primary:hover { color: #17110d; background: #f0a574; border-color: #f0a574; }
+
+@media (max-width: 1250px) {
+  .chairman-students-page .students-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chairman-students-page .students-search-field { grid-column: span 2; }
+  .chairman-students-page .students-filter-actions { justify-content: flex-start; }
+}
+@media (max-width: 767.98px) {
+  .chairman-students-page { padding-top: 25px !important; }
+  .chairman-students-page .students-page-title { font-size: 2.2rem; }
+  .chairman-students-page .students-page-subtitle { font-size: .87rem; }
+  .chairman-students-page .students-header-actions { display: grid !important; grid-template-columns: 1fr 1fr; width: 100%; }
+  .chairman-students-page .students-header-actions .students-btn:last-child { grid-column: 1 / -1; }
+  .chairman-students-page .students-header-actions .students-btn { width: 100%; }
+  .chairman-students-page .students-filter-panel { padding: 17px; }
+  .chairman-students-page .students-filter-grid { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .chairman-students-page .students-search-field { grid-column: auto; }
+  .chairman-students-page .students-filter-actions .students-btn { flex: 1; }
+  .chairman-students-page .students-roster-heading { align-items: flex-start; padding: 19px 17px; }
+  .chairman-students-page .students-roster-heading p { max-width: 260px; line-height: 1.5; }
+  .chairman-students-page .students-roster-count { padding: 7px 9px; }
+  .chairman-students-page .students-table thead th, .chairman-students-page .students-table tbody td { padding-inline: 14px; }
+  .chairman-students-page .students-table thead th:first-child, .chairman-students-page .students-table tbody td:first-child { padding-left: 17px; }
+}
+@media (max-width: 420px) {
+  .chairman-students-page .students-eyebrow { font-size: .58rem; letter-spacing: .11em; }
+  .chairman-students-page .students-roster-heading { flex-direction: column; gap: 14px; }
+  .chairman-students-page .students-roster-count { align-self: flex-start; }
+  .chairman-students-page .students-header-actions { grid-template-columns: 1fr; }
+  .chairman-students-page .students-header-actions .students-btn:last-child { grid-column: auto; }
+}
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .chairman-students-page { max-width: none !important; padding: 0 !important; color: #111 !important; }
+  .chairman-students-page .students-eyebrow, .chairman-students-page .students-header-actions,
+  .chairman-students-page .students-filter-panel, .chairman-students-page .d-print-none,
+  .chairman-students-modal, .navbar, footer { display: none !important; }
+  .chairman-students-page .students-page-title, .chairman-students-page .students-page-title span,
+  .chairman-students-page .students-page-subtitle, .chairman-students-page .students-roster-heading h2,
+  .chairman-students-page .students-roster-heading p { color: #111 !important; }
+  .chairman-students-page .students-roster-panel { border: 0 !important; box-shadow: none !important; background: #fff !important; }
+  .chairman-students-page .students-roster-heading { padding: 8px 0 12px !important; border-bottom: 1px solid #aaa !important; }
+  .chairman-students-page .students-section-kicker { color: #555 !important; }
+  .chairman-students-page .students-table { min-width: 0 !important; width: 100% !important; }
+  .chairman-students-page .students-table thead th { color: #222 !important; background: #eee !important; border: 1px solid #bbb !important; }
+  .chairman-students-page .students-table tbody td { color: #111 !important; background: #fff !important; border: 1px solid #ccc !important; }
+  .chairman-students-page .students-name, .chairman-students-page .students-supervisor-name,
+  .chairman-students-page .students-id span, .chairman-students-page .students-email,
+  .chairman-students-page .students-status, .chairman-students-page .students-allocation-state,
+  .chairman-students-page .students-session-tag, .chairman-students-page .students-unallocated { color: #111 !important; background: transparent !important; border-color: #777 !important; }
+  .chairman-students-page .students-avatar { display: none !important; }
+  .chairman-students-page .students-identity { min-width: 0 !important; }
+  @page { size: landscape; margin: 12mm; }
+}

@@ -1,0 +1,96 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/capacities.css">
+
+<main class="container-fluid capacities-page py-4 px-md-4">
+    <section class="capacities-heading d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+        <div>
+            <div class="capacities-eyebrow"><i class="bi bi-sliders2-vertical me-2"></i>FACULTY MANAGEMENT</div>
+            <h1 class="capacities-title mb-2">Supervisor Capacities</h1>
+            <p class="capacities-subtitle mb-0">Set student limits for each supervisor and monitor their current workload.</p>
+        </div>
+        <a href="/chairman/dashboard" class="btn cap-btn-secondary"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+    </section>
+
+    <section class="capacities-panel">
+        <div class="capacities-panel-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="capacities-panel-icon"><i class="bi bi-people"></i></div>
+                <div>
+                    <h2 class="capacities-panel-title mb-1">Capacity settings</h2>
+                    <p class="capacities-panel-subtitle mb-0">Update the maximum number of students assigned to each supervisor.</p>
+                </div>
+            </div>
+            <span class="capacities-count"><i class="bi bi-person-badge me-1"></i><%= capacities.length %> supervisors</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table capacities-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-start">Supervisor</th>
+                        <th scope="col" class="text-start">Email address</th>
+                        <th scope="col">Assigned</th>
+                        <th scope="col">Maximum capacity</th>
+                        <th scope="col">Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (capacities.length === 0) { %>
+                        <tr>
+                            <td colspan="5">
+                                <div class="capacities-empty">
+                                    <div class="capacities-empty-icon"><i class="bi bi-person-x"></i></div>
+                                    <h3>No supervisors found</h3>
+                                    <p>Add supervisors in User Management before setting their capacity.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } else { %>
+                        <% capacities.forEach(cap => { %>
+                            <tr>
+                                <td class="text-start">
+                                    <div class="capacity-person">
+                                        <div class="capacity-avatar"><i class="bi bi-person-badge"></i></div>
+                                        <div class="capacity-person-name"><%= cap.name %></div>
+                                    </div>
+                                </td>
+                                <td class="text-start">
+                                    <span class="capacity-email"><%= cap.email %></span>
+                                </td>
+                                <td>
+                                    <span class="capacity-assigned"><%= cap.current_count %></span>
+                                </td>
+                                <td>
+                                    <form action="/chairman/capacities/set" method="POST" class="capacity-edit-form">
+                                        <input type="hidden" name="supervisor_id" value="<%= cap.supervisor_id %>">
+                                        <label class="visually-hidden" for="capacity-<%= cap.supervisor_id %>">Maximum students for <%= cap.name %></label>
+                                        <div class="capacity-input-group">
+                                            <input id="capacity-<%= cap.supervisor_id %>" type="number" class="form-control capacity-number" name="max_students" value="<%= cap.max_students %>" min="1" max="20" required>
+                                            <button type="submit" class="btn cap-save-btn" aria-label="Save capacity for <%= cap.name %>" title="Save capacity">
+                                                <i class="bi bi-check2"></i><span>Save</span>
+                                            </button>
+                                        </div>
+                                        <div class="capacity-range-hint">Allowed range: 1–20 students</div>
+                                    </form>
+                                </td>
+                                <td>
+                                    <% if (cap.current_count >= cap.max_students) { %>
+                                        <span class="capacity-status capacity-status-full"><span class="capacity-status-dot"></span>At capacity</span>
+                                    <% } else { %>
+                                        <span class="capacity-status capacity-status-available"><span class="capacity-status-dot"></span>Available</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div class="capacities-panel-footer">
+            <i class="bi bi-info-circle me-2"></i>Capacity changes affect future allocation availability. Check current assignments before reducing a supervisor's limit.
+        </div>
+    </section>
+</main>
+
+<%- include('../partials/footer') %>

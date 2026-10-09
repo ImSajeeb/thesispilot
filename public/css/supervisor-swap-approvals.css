@@ -1,0 +1,84 @@
+/* Supervisor Swap & Transfer Approvals — Onyx / Copper */
+.swap-approvals-page {
+  --swap-bg: #111111;
+  --swap-surface: #1c1c1c;
+  --swap-surface-2: #222222;
+  --swap-border: #343434;
+  --swap-text: #f1f1f1;
+  --swap-muted: #a3a3a3;
+  --swap-copper: #ea580c;
+  --swap-copper-light: #fb923c;
+  color: var(--swap-text);
+  padding: 32px 22px 54px;
+  min-height: calc(100vh - 80px);
+  background: radial-gradient(ellipse at 8% 0%, rgba(234,88,12,.09), transparent 34%), var(--swap-bg);
+}
+.swap-approvals-page * { box-sizing: border-box; }
+.swap-approvals-shell { width: min(1420px, 100%); margin: 0 auto; }
+.swap-approvals-page .swap-page-kicker,
+.swap-approvals-page .swap-panel-kicker {
+  color: var(--swap-copper-light); font-size: .69rem; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; margin-bottom: 8px;
+}
+.swap-approvals-page .swap-page-title { color: #fff; font-size: clamp(1.7rem, 3vw, 2.25rem); letter-spacing: -.045em; font-weight: 800; margin: 0 0 8px; }
+.swap-approvals-page .swap-page-subtitle { color: var(--swap-muted); margin: 0; max-width: 690px; line-height: 1.65; }
+.swap-approvals-page .swap-back-link { display: inline-flex; align-items: center; background: #202020; color: #e7e7e7; border: 1px solid #3a3a3a; border-radius: 10px; padding: 11px 15px; font-weight: 650; white-space: nowrap; }
+.swap-approvals-page .swap-back-link:hover { border-color: var(--swap-copper); color: #fff; background: #29211d; }
+.swap-approvals-page .alert-success { background: rgba(22,163,74,.1); color: #bbf7d0; border: 1px solid rgba(34,197,94,.28) !important; }
+.swap-approvals-page .swap-search-panel { margin: 27px 0 18px; padding: 14px; background: #191919; border: 1px solid var(--swap-border); border-radius: 14px; }
+.swap-approvals-page .swap-search-panel .input-group { min-height: 44px; }
+.swap-approvals-page .swap-search-panel .input-group-text { background: #252525 !important; color: var(--swap-copper-light) !important; padding-left: 15px; }
+.swap-approvals-page .swap-search-panel .form-control { background: #252525 !important; color: #f3f3f3 !important; box-shadow: none !important; padding-top: 11px; padding-bottom: 11px; }
+.swap-approvals-page .swap-search-panel .form-control::placeholder { color: #858585; }
+.swap-approvals-page .swap-overview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; margin-bottom: 24px; }
+.swap-approvals-page .swap-overview-item { display: flex; align-items: center; gap: 15px; padding: 19px 21px; border: 1px solid var(--swap-border); border-radius: 15px; background: linear-gradient(120deg, #202020, #181818); }
+.swap-approvals-page .swap-overview-icon { width: 45px; height: 45px; flex: 0 0 45px; display: grid; place-items: center; border-radius: 12px; font-size: 1.15rem; }
+.swap-approvals-page .swap-overview-icon.outgoing { color: #fdba74; background: rgba(234,88,12,.15); border: 1px solid rgba(234,88,12,.23); }
+.swap-approvals-page .swap-overview-icon.incoming { color: #d4d4d4; background: #303030; border: 1px solid #444; }
+.swap-approvals-page .swap-overview-item div { display: grid; gap: 2px; }
+.swap-approvals-page .swap-overview-label { color: #c5c5c5; font-size: .83rem; font-weight: 650; }
+.swap-approvals-page .swap-overview-item strong { color: #fff; font-size: 1.55rem; line-height: 1.2; }
+.swap-approvals-page .swap-overview-item small { color: #858585; font-size: .75rem; }
+.swap-approvals-page .swap-request-panel { background: var(--swap-surface); border: 1px solid var(--swap-border); border-radius: 16px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 12px 30px rgba(0,0,0,.15); }
+.swap-approvals-page .swap-panel-header { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 23px 24px; background: linear-gradient(115deg, #242424, #1c1c1c); border-bottom: 1px solid var(--swap-border); }
+.swap-approvals-page .swap-panel-kicker { font-size: .63rem; margin-bottom: 5px; }
+.swap-approvals-page .swap-panel-title { display: flex; align-items: center; color: #f7f7f7; font-size: 1.08rem; font-weight: 750; margin: 0; }
+.swap-approvals-page .swap-panel-title i { color: var(--swap-copper-light); }
+.swap-approvals-page .swap-panel-description { color: #929292; font-size: .82rem; margin: 6px 0 0; }
+.swap-approvals-page .swap-count-badge { white-space: nowrap; padding: 7px 11px; border-radius: 999px; color: #fed7aa; border: 1px solid rgba(234,88,12,.35); background: rgba(234,88,12,.12); font-size: .76rem; font-weight: 750; }
+.swap-approvals-page .swap-count-badge.incoming-count { color: #e5e5e5; border-color: #484848; background: #303030; }
+.swap-approvals-page .table-responsive { overflow-x: auto; }
+.swap-approvals-page .swap-table { min-width: 830px; width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
+.swap-approvals-page .swap-table thead th { background: #171717; color: #929292; border: 0; border-bottom: 1px solid #363636; padding: 14px 15px; font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 800; white-space: nowrap; }
+.swap-approvals-page .swap-table tbody td { color: #c9c9c9; background: #1c1c1c; border-bottom: 1px solid #303030; padding: 17px 15px; vertical-align: middle; font-size: .85rem; }
+.swap-approvals-page .swap-table tbody tr:last-child td { border-bottom: 0; }
+.swap-approvals-page .swap-table tbody tr:hover td { background: #24211f; }
+.swap-approvals-page .student-name-cell strong { color: #f4f4f4; font-weight: 700; }
+.swap-approvals-page .swap-person-chip { display: inline-block; max-width: 220px; padding: 6px 9px; border: 1px solid #414141; border-radius: 8px; background: #272727; color: #e0e0e0; font-size: .78rem; line-height: 1.35; }
+.swap-approvals-page .swap-person-chip i { color: var(--swap-copper-light); }
+.swap-approvals-page .swap-reason { display: -webkit-box; max-width: 280px; color: #a7a7a7; line-height: 1.5; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.swap-approvals-page .swap-status { display: inline-flex; align-items: center; gap: 7px; border-radius: 8px; padding: 7px 9px; font-size: .73rem; font-weight: 700; line-height: 1.3; }
+.swap-approvals-page .swap-status > span { width: 6px; height: 6px; border-radius: 50%; flex: 0 0 6px; background: currentColor; }
+.swap-approvals-page .waiting-faculty { color: #fbbf24; background: rgba(202,138,4,.12); border: 1px solid rgba(202,138,4,.25); }
+.swap-approvals-page .waiting-chairman { color: #93c5fd; background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.25); }
+.swap-approvals-page .swap-type-chip { display: inline-flex; padding: 6px 9px; border-radius: 7px; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.swap-approvals-page .mutual-type { color: #fdba74; background: rgba(234,88,12,.13); border: 1px solid rgba(234,88,12,.25); }
+.swap-approvals-page .transfer-type { color: #d4d4d4; background: #303030; border: 1px solid #484848; }
+.swap-approvals-page .swap-action-btn { border-radius: 8px; padding: 8px 11px; font-size: .78rem; font-weight: 750; transition: background .18s ease, border-color .18s ease, transform .18s ease; white-space: nowrap; }
+.swap-approvals-page .swap-action-btn:hover { transform: translateY(-1px); }
+.swap-approvals-page .cancel-btn, .swap-approvals-page .reject-btn { color: #fca5a5; background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.3); }
+.swap-approvals-page .cancel-btn:hover, .swap-approvals-page .reject-btn:hover { color: #fff; background: #991b1b; border-color: #b91c1c; }
+.swap-approvals-page .accept-btn { color: #fff; background: var(--swap-copper); border: 1px solid var(--swap-copper); }
+.swap-approvals-page .accept-btn:hover { background: #c2410c; border-color: #c2410c; }
+.swap-approvals-page .swap-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 38px 20px 42px; }
+.swap-approvals-page .swap-empty-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 12px; border-radius: 14px; background: #292929; border: 1px solid #3d3d3d; color: #b9b9b9; font-size: 1.15rem; }
+.swap-approvals-page .swap-empty-state strong { color: #e7e7e7; font-size: .92rem; }
+.swap-approvals-page .swap-empty-state p { color: #898989; font-size: .82rem; margin: 5px 0 0; }
+@media (max-width: 767.98px) {
+  .swap-approvals-page { padding: 24px 13px 38px; }
+  .swap-approvals-page .swap-overview-grid { grid-template-columns: 1fr; gap: 10px; }
+  .swap-approvals-page .swap-panel-header { align-items: flex-start; padding: 19px 16px; }
+  .swap-approvals-page .swap-panel-title { font-size: .98rem; }
+  .swap-approvals-page .swap-count-badge { margin-top: 3px; font-size: .69rem; }
+  .swap-approvals-page .swap-table { min-width: 790px; }
+}

@@ -1,0 +1,147 @@
+<%- include('../partials/header') %>\n<link rel="stylesheet" href="/css/supervisor-swap.css">
+
+
+<main class="supervisor-swap-page">
+<div class="swap-shell">
+    
+    <!-- Header -->
+    <header class="swap-page-header">
+        <div class="swap-heading-group">
+            <span class="swap-eyebrow"><i class="bi bi-arrow-left-right"></i> SUPERVISOR WORKSPACE</span>
+            <h1>Transfer or Swap Student</h1>
+            <p>Move a student to another supervisor or request a mutual exchange, with a clear justification for review.</p>
+        </div>
+        <a href="/supervisor/dashboard" class="swap-back-link"><i class="bi bi-arrow-left"></i><span>Back to Dashboard</span></a>
+    </header>
+
+    <section class="swap-process-strip" aria-label="Request workflow">
+        <div class="swap-process-step"><span class="swap-step-number">01</span><div><strong>Choose your student</strong><small>Select the student currently assigned to you</small></div></div>
+        <div class="swap-process-connector"></div>
+        <div class="swap-process-step"><span class="swap-step-number">02</span><div><strong>Choose request type</strong><small>Transfer or mutual swap</small></div></div>
+        <div class="swap-process-connector"></div>
+        <div class="swap-process-step"><span class="swap-step-number">03</span><div><strong>Submit for review</strong><small>Add a reason before sending</small></div></div>
+    </section>
+
+    <% if (errorMsg && errorMsg.length > 0) { %>
+        <div class="swap-error-alert"><i class="bi bi-exclamation-triangle-fill"></i><span><%= errorMsg %></span></div>
+    <% } %>
+
+    <section class="swap-workspace-card">
+        <div class="swap-card-header">
+            <div class="swap-card-icon"><i class="bi bi-arrow-left-right"></i></div>
+            <div><h2>Request details</h2><p>Complete the fields below to prepare your request.</p></div>
+            <span class="swap-required-note"><span>*</span> Required fields</span>
+        </div>
+        <div class="swap-card-body">
+            
+            <!-- Student Filter Form -->
+            <section class="swap-filter-panel">
+                <div class="swap-filter-heading"><i class="bi bi-funnel"></i><div><strong>Find your student</strong><small>Filter the list by name, ID, or academic session.</small></div></div>
+                <form method="GET" action="/supervisor/swap" class="row g-2 swap-filter-form">
+                <div class="col-md-6">
+                    <input type="text" name="search" class="form-control swap-control" placeholder="Search student name or ID..." value="<%= filters.search %>">
+                </div>
+                <div class="col-md-4">
+                    <select name="session_id" class="form-select swap-control">
+                        <option value="">All Academic Sessions</option>
+                        <% sessions.forEach(s => { %>
+                            <option value="<%= s.id %>" <%= Number(filters.sessionId) === Number(s.id) ? 'selected' : '' %>><%= s.session_name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn swap-filter-button w-100">Filter</button>
+                    <a href="/supervisor/swap" class="btn swap-reset-button" title="Reset Filters">✕</a>
+                </div>
+                </form>
+            </section>
+
+            <form action="/supervisor/swap" method="POST" class="swap-request-form">
+                
+                <div class="swap-form-field">
+                    <label class="swap-field-label">1. Select Your Student to Move</label>
+                    <select class="form-select swap-control swap-select" name="my_student_id" required>
+                        <option value="">-- Choose from filtered students (<%= myStudents.length %> available) --</option>
+                        <% myStudents.forEach(stu => { %>
+                            <option value="<%= stu.student_id %>"><%= stu.student_name %> (ID: <%= stu.student_code %>) — [<%= stu.session_name %>]</option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="swap-form-field">
+                    <label class="swap-field-label">2. Select Action Type</label>
+                    <select class="form-select swap-control swap-select" name="swap_type" id="swapTypeSelect" required onchange="toggleSwapFields()">
+                        <option value="">-- Choose an action --</option>
+                        <option value="transfer">One-Way Transfer (Hand over student to another supervisor)</option>
+                        <option value="mutual">Mutual Swap (Trade student with another faculty member)</option>
+                    </select>
+                </div>
+
+                <!-- TRANSFER FIELD -->
+                <div class="swap-form-field swap-conditional-field d-none" id="transferField">
+                    <div class="swap-conditional-note"><i class="bi bi-person-check"></i><span><strong>One-way transfer</strong><small>Choose an available supervisor who can receive this student.</small></span></div>
+                    <label class="swap-field-label">3. Select Receiving Supervisor</label>
+                    <select class="form-select swap-control swap-select" name="target_supervisor_id">
+                        <option value="">-- Choose supervisor --</option>
+                        <% otherSupervisors.forEach(sup => { %>
+                            <% const isFull = sup.assigned_count >= sup.capacity; %>
+                            <option value="<%= sup.supervisor_id %>" <%= isFull ? 'disabled' : '' %>>
+                                <%= sup.supervisor_name %> (Capacity: <%= sup.assigned_count %>/<%= sup.capacity %>) <%= isFull ? ' [FULL]' : '' %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <!-- MUTUAL SWAP FIELD -->
+                <div class="swap-form-field swap-conditional-field d-none" id="mutualField">
+                    <div class="swap-conditional-note"><i class="bi bi-arrow-left-right"></i><span><strong>Mutual swap</strong><small>Select a student currently supervised by another faculty member.</small></span></div>
+                    <label class="swap-field-label">3. Select Target Student to Receive in Return</label>
+                    <select class="form-select swap-control swap-select" name="target_student_id">
+                        <option value="">-- Choose a student currently supervised by someone else --</option>
+                        <% otherStudents.forEach(stu => { %>
+                            <option value="<%= stu.student_id %>">
+                                <%= stu.student_name %> (ID: <%= stu.student_code %>) — Supervisor: <%= stu.supervisor_name %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="swap-form-field">
+                    <label class="swap-field-label">4. Reason / Justification</label>
+                    <textarea class="form-control swap-control swap-reason-control" name="reason" rows="4" required placeholder="Provide a justification for the receiving supervisor and chairman to review..."></textarea>
+                </div>
+
+                <div class="swap-submit-area">
+                    <div class="swap-submit-copy"><i class="bi bi-shield-check"></i><span><strong>Review before submitting</strong><small>Your request will be sent to the receiving supervisor for initial approval.</small></span></div>
+                    <button type="submit" class="btn swap-submit-button" onclick="return confirm('Submit this request? It will be sent to the receiving supervisor for initial approval.');">
+                        <i class="bi bi-send-fill"></i><span>Submit Transfer Request</span><i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+</main>
+
+<script>
+    function toggleSwapFields() {
+        const type = document.getElementById('swapTypeSelect').value;
+        const tField = document.getElementById('transferField');
+        const mField = document.getElementById('mutualField');
+
+        tField.classList.add('d-none');
+        mField.classList.add('d-none');
+        tField.querySelector('select').required = false;
+        mField.querySelector('select').required = false;
+
+        if (type === 'transfer') {
+            tField.classList.remove('d-none');
+            tField.querySelector('select').required = true;
+        } else if (type === 'mutual') {
+            mField.classList.remove('d-none');
+            mField.querySelector('select').required = true;
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

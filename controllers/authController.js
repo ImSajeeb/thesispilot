@@ -611,7 +611,7 @@ exports.submitResetPassword = async (req, res) => {
             return res.redirect('/auth/reset-password');
         }
 
-        if (password.length < 8) {
+        if (password.length < 4) {
             req.flash('error', 'Password must be at least 8 characters long.');
             return res.redirect('/auth/reset-password');
         }

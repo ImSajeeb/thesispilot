@@ -99,17 +99,7 @@ if (process.env.DB_SSL === 'true') {
 const sessionStore = new MySQLStore(sessionDbOptions);
 
 // Log session-store readiness or initialization failure.
-sessionStore.onReady()
-    .then(() => {
-        console.log('MySQL session store ready');
-    })
-    .catch((error) => {
-        console.error(
-            'MySQL session store initialization failed:',
-            error
-        );
-    });
-
+console.log('MySQL session store configured');
 // ============================================================
 // EXPRESS SESSION
 // ============================================================

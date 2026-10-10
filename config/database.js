@@ -1,13 +1,9 @@
-const mysql = require('mysql2/promise'); // 1. Changed to native promises
-const fs = require('fs');
-const path = require('path');
+const mysql = require('mysql2');
 require('dotenv').config();
-
-const useSSL = process.env.DB_SSL === 'true';
 
 const poolConfig = {
     host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT || 3306),
+    port: Number(process.env.DB_PORT || 26229), // Ensure this matches Aiven's port
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
@@ -15,37 +11,24 @@ const poolConfig = {
     connectionLimit: 10,
     queueLimit: 0,
     enableKeepAlive: true,
-    keepAliveInitialDelay: 10000
+    keepAliveInitialDelay: 10000,
+    ssl: {
+        rejectUnauthorized: false // Forces SSL natively for Aiven without needing a local ca.pem file
+    }
 };
 
-// Use certificate-verified TLS when connecting to Aiven
-if (useSSL) {
-    const caPath = process.env.DB_SSL_CA
-        ? path.resolve(process.env.DB_SSL_CA)
-        : path.join(__dirname, 'ca.pem');
-
-    if (!fs.existsSync(caPath)) {
-        console.warn(`Warning: MySQL CA certificate not found at ${caPath}`);
-    } else {
-        poolConfig.ssl = {
-            ca: fs.readFileSync(caPath, 'utf8'),
-            rejectUnauthorized: true
-        };
-    }
-}
-
-// 2. Create the native promise pool directly
 const pool = mysql.createPool(poolConfig);
+const promisePool = pool.promise();
 
-// 3. Verify the connection using Promises instead of callbacks
-pool.getConnection()
-    .then(connection => {
+// Verify the connection
+pool.getConnection((err, connection) => {
+    if (err) {
+        console.error('Database connection failed:', err.message);
+    } else {
         console.log('Database connected successfully');
         connection.release();
-    })
-    .catch(err => {
-        console.error('Database connection failed:', err.message);
-    });
+    }
+});
 
-// 4. Export the native pool
-module.exports = pool;
+// Export only the promise-based pool for your controllers
+module.exports = promisePool;

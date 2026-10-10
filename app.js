@@ -1,7 +1,6 @@
 const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-const db = require('./config/database'); // Make sure this points to the updated file (e.g., './database_2' if you kept that name)
 const flash = require('connect-flash');
 const path = require('path');
 require('dotenv').config();
@@ -21,7 +20,7 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Uploaded thesis documents must never be served directly from the public folder[cite: 4].
+// Uploaded thesis documents must never be served directly from the public folder
 app.use((req, res, next) => {
     if (req.path === '/uploads' || req.path.startsWith('/uploads/')) {
         return res.status(404).send('Document access must use an authenticated file link.');
@@ -33,18 +32,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ============================================================
 // SESSION
 // ============================================================
-// Configure the MySQL session store using the promise-based pool
+// Provide explicit credentials so the store creates its own compatible connection
 const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT || 26229),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    ssl: { rejectUnauthorized: false }, // Required for Aiven
     clearExpired: true,
-    checkExpirationInterval: 900000, // Checks every 15 minutes
-    expiration: 86400000,            // Sessions last for 24 hours
-    createDatabaseTable: true        // Automatically creates the 'sessions' table
-}, db);
+    checkExpirationInterval: 900000, // 15 minutes
+    expiration: 86400000,            // 24 hours
+    createDatabaseTable: true        // Automatically builds the sessions table
+});
 
 app.use(session({
     key: 'thesispilot_session',
-    secret: process.env.SESSION_SECRET,
-    store: sessionStore, // Uses the Aiven database for session storage
+    secret: process.env.SESSION_SECRET || 'thesispilot_secure_fallback',
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -84,5 +89,5 @@ app.use('/admin', require('./routes/admin'));
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`ThesisPilot server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

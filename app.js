@@ -1,5 +1,7 @@
 const express = require('express');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const db = require('./config/database'); // Import your database pool
 const flash = require('connect-flash');
 const path = require('path');
 require('dotenv').config();
@@ -34,13 +36,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 // SESSION
 // ============================================================
 
+// Configure the MySQL session store
+const sessionStore = new MySQLStore({
+    clearExpired: true,
+    checkExpirationInterval: 900000, // Checks every 15 minutes
+    expiration: 86400000 // Sessions last for 24 hours
+}, db);
+
 app.use(session({
+    key: 'thesispilot_session',
     secret: process.env.SESSION_SECRET,
-
+    store: sessionStore, // Use the database for session storage
     resave: false,
-
     saveUninitialized: false,
-
     cookie: {
         maxAge: 1000 * 60 * 60 * 24, // 1 day
         httpOnly: true,
@@ -62,13 +70,9 @@ app.use(flash());
 // ============================================================
 
 app.use((req, res, next) => {
-
     res.locals.successMsg = req.flash('success');
-
     res.locals.errorMsg = req.flash('error');
-
     res.locals.user = req.session.user || null;
-
     next();
 });
 
@@ -78,22 +82,12 @@ app.use((req, res, next) => {
 // ============================================================
 
 app.use('/', require('./routes/index'));
-
 app.use('/auth', require('./routes/auth'));
-
 app.use('/chairman', require('./routes/chairman'));
-
 app.use('/student', require('./routes/student'));
-
 app.use('/supervisor', require('./routes/supervisor'));
-
 app.use('/files', require('./routes/files'));
-
 app.use('/admin', require('./routes/admin'));
-
-
-// Admin routes will be added next.
-// app.use('/admin', require('./routes/admin'));
 
 
 // ============================================================
@@ -102,15 +96,10 @@ app.use('/admin', require('./routes/admin'));
 
 const PORT = process.env.PORT || 3000;
 const net = require('net');
-
 const dns = require('dns');
-
 
 const host = process.env.DB_HOST;
 const port = Number(process.env.DB_PORT);
-
-
-
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

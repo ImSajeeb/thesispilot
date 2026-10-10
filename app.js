@@ -109,7 +109,18 @@ if (process.env.DB_SSL === 'true') {
 }
 
 const sessionPool = mysql.createPool(sessionDbOptions);
+sessionPool.getConnection((err, connection) => {
+    if (err) {
+        console.error(
+            '[SESSION DB TEST] Failed:',
+            err.code || err.message
+        );
+        return;
+    }
 
+    console.log('[SESSION DB TEST] Connected successfully');
+    connection.release();
+});
 // ============================================================
 // MYSQL SESSION STORE
 // ============================================================

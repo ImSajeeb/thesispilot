@@ -4,20 +4,6 @@ const db = require('../config/database');
 const transporter = require('../config/mailer');
 const crypto = require('crypto');
 
-
-// req.session.resetEmail = normalizedEmail;
-// req.session.resetOtp = otpCode;
-// req.session.resetVerified = false;
-
-// req.session.save((err) => {
-//     if (err) {
-//         console.error('Failed to save reset session:', err);
-//         req.flash('error', 'Could not start password reset. Please try again.');
-//         return res.redirect('/auth/forgot-password');
-//     }
-
-//     res.redirect('/auth/reset-otp');
-// });
 // ========================================
 // LOGIN
 // ========================================
@@ -631,15 +617,73 @@ exports.submitResetPassword = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
+        const resetEmail = req.session.resetEmail;
+        const transientDbErrors = new Set([
+            'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'EPIPE',
+            'PROTOCOL_CONNECTION_LOST', 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR',
+            'ER_SERVER_SHUTDOWN', 'ER_CON_COUNT_ERROR'
+        ]);
 
-        // Parameterized role value fixes the same SQL quoting issue here.
-        const [result] = await db.execute(
-            'UPDATE users SET password_hash = ? WHERE email = ? AND role = ?',
-            [hashedPassword, req.session.resetEmail, 'student']
-        );
+        let updated = false;
+        let lastDbError;
 
-        if (result.affectedRows !== 1) {
-            req.flash('error', 'Unable to update the student account password.');
+        // Retry only this idempotent password update. Reuse the same hash on
+        // every attempt, and verify the stored hash if a connection drops.
+        for (let attempt = 1; attempt <= 3 && !updated; attempt += 1) {
+            try {
+                const [result] = await db.execute(
+                    'UPDATE users SET password_hash = ? WHERE email = ? AND role = ?',
+                    [hashedPassword, resetEmail, 'student']
+                );
+
+                if (result.affectedRows === 1) {
+                    updated = true;
+                    break;
+                }
+
+                // MySQL may report zero changed rows if the first attempt
+                // already committed before its response was lost.
+                const [rows] = await db.execute(
+                    'SELECT password_hash FROM users WHERE email = ? AND role = ? LIMIT 1',
+                    [resetEmail, 'student']
+                );
+                updated = rows.length === 1 &&
+                    await bcrypt.compare(password, rows[0].password_hash);
+                if (!updated) break;
+            } catch (error) {
+                lastDbError = error;
+                if (!transientDbErrors.has(error.code) || attempt === 3) break;
+
+                // The update may have reached MySQL before the connection
+                // failed. Check the stored hash before deciding to retry.
+                try {
+                    const [rows] = await db.execute(
+                        'SELECT password_hash FROM users WHERE email = ? AND role = ? LIMIT 1',
+                        [resetEmail, 'student']
+                    );
+                    if (rows.length === 1 && await bcrypt.compare(password, rows[0].password_hash)) {
+                        updated = true;
+                        break;
+                    }
+                } catch (verifyError) {
+                    lastDbError = verifyError;
+                }
+
+                await new Promise((resolve) => setTimeout(resolve, attempt * 750));
+            }
+        }
+
+        if (!updated) {
+            if (lastDbError) {
+                console.error('Reset password database update failed:', {
+                    code: lastDbError.code || 'UNKNOWN',
+                    message: lastDbError.message
+                });
+                req.flash('error', 'Database is temporarily unavailable. Please try again shortly.');
+                return res.redirect('/auth/reset-password');
+            }
+
+            req.flash('error', 'Unable to update the student account password. Please request a new reset code if needed.');
             return res.redirect('/auth/forgot-password');
         }
 

@@ -109,38 +109,6 @@ const dns = require('dns');
 const host = process.env.DB_HOST;
 const port = Number(process.env.DB_PORT);
 
-dns.lookup(host, { all: true }, (err, addresses) => {
-    if (err) {
-        console.error('[AIVEN DNS TEST] Failed:', err.code);
-        return;
-    }
-
-    console.log(
-        '[AIVEN DNS TEST] Resolved addresses:',
-        addresses.map(item => ({
-            address: item.address,
-            family: item.family
-        }))
-    );
-
-    const socket = net.createConnection({ host, port });
-
-    socket.setTimeout(100000);
-
-    socket.on('connect', () => {
-        console.log('[AIVEN TCP TEST] Connected');
-        socket.end();
-    });
-
-    socket.on('timeout', () => {
-        console.error('[AIVEN TCP TEST] Timed out');
-        socket.destroy();
-    });
-
-    socket.on('error', error => {
-        console.error('[AIVEN TCP TEST] Error:', error.code);
-    });
-});
 
 
 

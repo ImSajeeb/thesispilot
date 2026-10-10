@@ -101,6 +101,28 @@ app.use('/admin', require('./routes/admin'));
 // ============================================================
 
 const PORT = process.env.PORT || 3000;
+const net = require('net');
+
+const socket = net.createConnection({
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT)
+});
+
+socket.setTimeout(10000);
+
+socket.on('connect', () => {
+    console.log('[AIVEN TCP TEST] Connection successful');
+    socket.end();
+});
+
+socket.on('timeout', () => {
+    console.error('[AIVEN TCP TEST] Connection timed out');
+    socket.destroy();
+});
+
+socket.on('error', (err) => {
+    console.error('[AIVEN TCP TEST] Error:', err.code);
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

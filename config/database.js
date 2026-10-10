@@ -1,4 +1,3 @@
-
 const mysql = require('mysql2');
 const fs = require('fs');
 const path = require('path');
@@ -14,10 +13,13 @@ const poolConfig = {
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    // ADDED: Prevent Aiven from dropping idle connections
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000
 };
 
-// Use certificate-verified TLS when connecting to Aiven.
+// Use certificate-verified TLS when connecting to Aiven[cite: 7].
 if (useSSL) {
     const caPath = process.env.DB_SSL_CA
         ? path.resolve(process.env.DB_SSL_CA)
@@ -38,7 +40,7 @@ if (useSSL) {
 const pool = mysql.createPool(poolConfig);
 const promisePool = pool.promise();
 
-// Verify the database connection.
+// Verify the database connection[cite: 7].
 pool.getConnection((err, connection) => {
     if (err) {
         console.error('Database connection failed:', err.message);

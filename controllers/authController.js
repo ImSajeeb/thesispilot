@@ -4,6 +4,20 @@ const db = require('../config/database');
 const transporter = require('../config/mailer');
 const crypto = require('crypto');
 
+
+// req.session.resetEmail = normalizedEmail;
+// req.session.resetOtp = otpCode;
+// req.session.resetVerified = false;
+
+// req.session.save((err) => {
+//     if (err) {
+//         console.error('Failed to save reset session:', err);
+//         req.flash('error', 'Could not start password reset. Please try again.');
+//         return res.redirect('/auth/forgot-password');
+//     }
+
+//     res.redirect('/auth/reset-otp');
+// });
 // ========================================
 // LOGIN
 // ========================================

@@ -24,7 +24,7 @@
                         </div>
                         <h3 class="fw-bolder text-dark mb-2">Supervisor Allocation</h3>
                         <p class="text-secondary mx-auto mb-4" style="max-width: 550px;">
-                            The department will allocate your supervisor using your submitted priority preference list and available faculty capacities[cite: 10].
+                            The department will allocate your supervisor using your submitted priority preference list and available faculty capacities.
                         </p>
                         <a href="/student/preferences" class="btn btn-primary btn-action shadow-sm">
                             <i class="bi bi-list-ol me-2"></i> Review Supervisor Preferences
@@ -38,7 +38,7 @@
                     <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center" role="alert">
                         <i class="bi bi-info-circle-fill fs-4 text-info me-3"></i>
                         <div>
-                            <strong>Supervisor Updated:</strong> Your supervisor assignment has been officially updated by the department via a faculty transfer or mutual swap[cite: 10]. Your dashboard now reflects your new supervisor.
+                            <strong>Supervisor Updated:</strong> Your supervisor assignment has been officially updated by the department via a faculty transfer or mutual swap. Your dashboard now reflects your new supervisor.
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -112,7 +112,7 @@
                             <% } else { %>
                                 <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4">
                                     <strong><i class="bi bi-info-circle-fill me-1"></i> Ready for Proposal Submission:</strong> 
-                                    Provide your research title, abstract summary, and upload the proposal document (PDF) for your supervisor's review[cite: 10].
+                                    Provide your research title, abstract summary, and upload the proposal document (PDF) for your supervisor's review.
                                 </div>
                             <% } %>
 
@@ -175,7 +175,7 @@
                                 <h4 class="fw-bolder text-dark mb-3"><i class="bi bi-award-fill text-success me-2"></i> Final Thesis</h4>
                                 
                                 <% if (thesis.status === 'proposal_approved') { %>
-                                    <div class="alert alert-success border-0 shadow-sm rounded-4 mb-3">Your proposal is approved! When your research is complete, upload your final manuscript here[cite: 10].</div>
+                                    <div class="alert alert-success border-0 shadow-sm rounded-4 mb-3">Your proposal is approved! When your research is complete, upload your final manuscript here.</div>
                                     <form action="/student/final" method="POST" enctype="multipart/form-data" class="bg-light p-4 border rounded-4 shadow-sm">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-secondary small text-uppercase">Upload Final Thesis Manuscript (PDF)</label>
@@ -188,7 +188,7 @@
 
                                 <% } else if (thesis.status === 'final_submitted' || thesis.status === 'under_evaluation') { %>
                                     <div class="alert alert-warning border-0 shadow-sm rounded-4">
-                                        <i class="bi bi-hourglass-split me-1"></i> Your final thesis has been submitted and is currently under evaluation by your supervisor[cite: 10].
+                                        <i class="bi bi-hourglass-split me-1"></i> Your final thesis has been submitted and is currently under evaluation by your supervisor.
                                     </div>
                                     <% if (thesis.final_file) { %>
                                         <a href="/files/final/<%= thesis.final_file.split('/').pop() %>" target="_blank" class="btn btn-outline-secondary mt-2 shadow-sm bg-white">
@@ -210,7 +210,7 @@
 
                                 <% } else { %>
                                     <div class="alert alert-light border text-muted rounded-4 py-3">
-                                        <i class="bi bi-lock-fill me-1"></i> Final submission will unlock automatically after your proposal is officially approved[cite: 10].
+                                        <i class="bi bi-lock-fill me-1"></i> Final submission will unlock automatically after your proposal is officially approved.
                                     </div>
                                 <% } %>
                             </div>

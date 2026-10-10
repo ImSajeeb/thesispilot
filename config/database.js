@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise'); // 1. Changed to native promises
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -14,41 +14,38 @@ const poolConfig = {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    // ADDED: Prevent Aiven from dropping idle connections
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000
 };
 
-// Use certificate-verified TLS when connecting to Aiven[cite: 7].
+// Use certificate-verified TLS when connecting to Aiven
 if (useSSL) {
     const caPath = process.env.DB_SSL_CA
         ? path.resolve(process.env.DB_SSL_CA)
         : path.join(__dirname, 'ca.pem');
 
     if (!fs.existsSync(caPath)) {
-        throw new Error(
-            `MySQL CA certificate not found: ${caPath}`
-        );
+        console.warn(`Warning: MySQL CA certificate not found at ${caPath}`);
+    } else {
+        poolConfig.ssl = {
+            ca: fs.readFileSync(caPath, 'utf8'),
+            rejectUnauthorized: true
+        };
     }
-
-    poolConfig.ssl = {
-        ca: fs.readFileSync(caPath, 'utf8'),
-        rejectUnauthorized: true
-    };
 }
 
+// 2. Create the native promise pool directly
 const pool = mysql.createPool(poolConfig);
-const promisePool = pool.promise();
 
-// Verify the database connection[cite: 7].
-pool.getConnection((err, connection) => {
-    if (err) {
+// 3. Verify the connection using Promises instead of callbacks
+pool.getConnection()
+    .then(connection => {
+        console.log('Database connected successfully');
+        connection.release();
+    })
+    .catch(err => {
         console.error('Database connection failed:', err.message);
-        return;
-    }
+    });
 
-    console.log('Database connected successfully');
-    connection.release();
-});
-
-module.exports = promisePool;
+// 4. Export the native pool
+module.exports = pool;

@@ -4,7 +4,6 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const path = require('path');
 const fs = require('fs');
-const mysql = require('mysql2');
 
 require('dotenv').config();
 
@@ -19,7 +18,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Required for secure cookies behind Render's reverse proxy.
+// Required when running behind Render's reverse proxy.
 app.set('trust proxy', 1);
 
 // ============================================================
@@ -29,7 +28,8 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Prevent direct public access to uploaded thesis documents.
+// Uploaded thesis documents must not be served directly
+// from the public folder.
 app.use((req, res, next) => {
     if (
         req.path === '/uploads' ||
@@ -46,36 +46,9 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================================
-// ENVIRONMENT VALIDATION
+// MYSQL SESSION STORE
 // ============================================================
 
-if (!process.env.SESSION_SECRET) {
-    throw new Error('SESSION_SECRET is missing from the environment.');
-}
-
-const requiredDbVariables = [
-    'DB_HOST',
-    'DB_USER',
-    'DB_PASS',
-    'DB_NAME'
-];
-
-const missingDbVariables = requiredDbVariables.filter(
-    (key) => !process.env[key]
-);
-
-if (missingDbVariables.length > 0) {
-    throw new Error(
-        `Missing database environment variables: ${missingDbVariables.join(', ')}`
-    );
-}
-
-// ============================================================
-// MYSQL2 CONNECTION POOL FOR PERSISTENT SESSIONS
-// ============================================================
-
-// Use the same database credentials as the main application.
-// This pool is dedicated to session storage.
 const sessionDbOptions = {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT || 3306),
@@ -87,10 +60,24 @@ const sessionDbOptions = {
     connectionLimit: 2,
     queueLimit: 0,
 
-    enableKeepAlive: true
+    // Session configuration.
+    clearExpired: true,
+    checkExpirationInterval: 15 * 60 * 1000,
+    expiration: 24 * 60 * 60 * 1000,
+
+    // The session store uses its own table.
+    // It does not replace your existing application tables.
+    schema: {
+        tableName: 'sessions',
+        columnNames: {
+            session_id: 'session_id',
+            expires: 'expires',
+            data: 'data'
+        }
+    }
 };
 
-// Use CA-verified SSL when connecting to Aiven.
+// Use the same CA-verified TLS approach as config/database.js.
 if (process.env.DB_SSL === 'true') {
     const caPath = process.env.DB_SSL_CA
         ? path.resolve(process.env.DB_SSL_CA)
@@ -108,49 +95,35 @@ if (process.env.DB_SSL === 'true') {
     };
 }
 
-const sessionPool = mysql.createPool(sessionDbOptions);
+// Create persistent session storage.
+const sessionStore = new MySQLStore(sessionDbOptions);
 
-// ============================================================
-// MYSQL SESSION STORE
-// ============================================================
-
-// The store receives the mysql2 pool explicitly, avoiding the
-// older mysql driver's authentication-protocol incompatibility.
-const sessionStore = new MySQLStore(
-    {
-        clearExpired: true,
-        checkExpirationInterval: 15 * 60 * 1000,
-        expiration: 24 * 60 * 60 * 1000,
-
-        schema: {
-            tableName: 'sessions',
-            columnNames: {
-                session_id: 'session_id',
-                expires: 'expires',
-                data: 'data'
-            }
-        }
-    },
-    sessionPool
-);
-
-// Log database-pool errors without exposing credentials.
-sessionPool.on('error', (error) => {
-    console.error(
-        'Session database pool error:',
-        error.code || error.message
-    );
-});
+// Log session-store readiness or initialization failure.
+sessionStore.onReady()
+    .then(() => {
+        console.log('MySQL session store ready');
+    })
+    .catch((error) => {
+        console.error(
+            'MySQL session store initialization failed:',
+            error
+        );
+    });
 
 // ============================================================
 // EXPRESS SESSION
 // ============================================================
 
+if (!process.env.SESSION_SECRET) {
+    throw new Error(
+        'SESSION_SECRET is missing from the environment.'
+    );
+}
+
 app.use(session({
     name: 'thesispilot.sid',
     secret: process.env.SESSION_SECRET,
     store: sessionStore,
-
     resave: false,
     saveUninitialized: false,
 
@@ -199,5 +172,5 @@ app.use('/admin', require('./routes/admin'));
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`ThesisPilot server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

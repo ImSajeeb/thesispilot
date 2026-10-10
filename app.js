@@ -5,10 +5,6 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-// Make sure this is at the top of app.js
-
-// Add this before your routes!
-app.use(express.static(path.join(__dirname, 'public')));
 // ============================================================
 // BASIC APP CONFIGURATION
 // ============================================================
@@ -24,6 +20,13 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Uploaded thesis documents must never be served directly from the public folder.
+app.use((req, res, next) => {
+    if (req.path === '/uploads' || req.path.startsWith('/uploads/')) {
+        return res.status(404).send('Document access must use an authenticated file link.');
+    }
+    next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -83,6 +86,8 @@ app.use('/chairman', require('./routes/chairman'));
 app.use('/student', require('./routes/student'));
 
 app.use('/supervisor', require('./routes/supervisor'));
+
+app.use('/files', require('./routes/files'));
 
 app.use('/admin', require('./routes/admin'));
 

@@ -1,5 +1,7 @@
 const db = require('../config/database');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const { uploadDocument, removeDocument } = require('../config/storage');
 
 
 const transporter = require('../config/mailer');
@@ -206,6 +208,10 @@ exports.submitReview = async (req, res) => {
         const { decision, feedback } = req.body;
 
         const [profiles] = await db.execute(`SELECT id FROM supervisor_profiles WHERE user_id = ? LIMIT 1`, [userId]);
+        if (profiles.length === 0) {
+            req.flash('error', 'Supervisor profile not found.');
+            return res.redirect('/supervisor/dashboard');
+        }
         const supervisorId = profiles[0].id;
 
         // Verify authorization and fetch student details for email
@@ -249,13 +255,23 @@ exports.submitReview = async (req, res) => {
 
         let filePath = null;
         if (req.file) {
-            filePath = '/uploads/feedback/' + req.file.filename;
+            const ext = require('path').extname(req.file.originalname || '').toLowerCase();
+            const filename = `file-${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
+            filePath = await uploadDocument({
+                folder: 'feedback', filename, buffer: req.file.buffer,
+                contentType: req.file.mimetype || 'application/octet-stream'
+            });
         }
 
-        if (filePath) {
-            await db.execute(`UPDATE theses SET status = ?, supervisor_feedback = ?, supervisor_feedback_file = ?, updated_at = NOW() WHERE id = ?`, [newStatus, feedback.trim(), filePath, thesisId]);
-        } else {
-            await db.execute(`UPDATE theses SET status = ?, supervisor_feedback = ?, updated_at = NOW() WHERE id = ?`, [newStatus, feedback.trim(), thesisId]);
+        try {
+            if (filePath) {
+                await db.execute(`UPDATE theses SET status = ?, supervisor_feedback = ?, supervisor_feedback_file = ?, updated_at = NOW() WHERE id = ?`, [newStatus, (feedback || '').trim(), filePath, thesisId]);
+            } else {
+                await db.execute(`UPDATE theses SET status = ?, supervisor_feedback = ?, updated_at = NOW() WHERE id = ?`, [newStatus, (feedback || '').trim(), thesisId]);
+            }
+        } catch (dbError) {
+            if (filePath) await removeDocument(filePath);
+            throw dbError;
         }
 
         // Send Notification Email to Student

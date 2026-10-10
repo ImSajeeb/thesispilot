@@ -10,7 +10,7 @@ node_modules/
 # Local uploaded documents
 uploads/
 public/uploads/
-
+config/ca.pem
 # Database exports and backups
 *.sql
 *.sql.gz

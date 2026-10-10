@@ -1,4 +1,6 @@
 const db = require('../config/database');
+const crypto = require('crypto');
+const { uploadDocument, removeDocument } = require('../config/storage');
 
 
 // DASHBOARD
@@ -114,13 +116,21 @@ exports.submitProposal = async (req, res) => {
             return res.redirect('/student/dashboard');
         }
 
-        const filePath = '/uploads/proposals/' + req.file.filename;
+        const filename = `proposal-${userId}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}.pdf`;
+        const filePath = await uploadDocument({
+            folder: 'proposals', filename, buffer: req.file.buffer, contentType: 'application/pdf'
+        });
 
-        await db.execute(`
-            UPDATE theses 
-            SET title = ?, abstract = ?, proposal_file = ?, status = 'proposal_submitted', updated_at = NOW() 
-            WHERE id = ?
-        `, [title.trim(), abstract.trim(), filePath, thesis.id]);
+        try {
+            await db.execute(`
+                UPDATE theses 
+                SET title = ?, abstract = ?, proposal_file = ?, status = 'proposal_submitted', updated_at = NOW() 
+                WHERE id = ?
+            `, [title.trim(), abstract.trim(), filePath, thesis.id]);
+        } catch (dbError) {
+            await removeDocument(filePath);
+            throw dbError;
+        }
 
         await db.execute(`
             INSERT INTO audit_logs (user_id, action, entity_type, entity_id, description, ip_address)
@@ -147,16 +157,34 @@ exports.uploadFinalThesis = async (req, res) => {
             return res.redirect('/student/dashboard');
         }
 
-        const [profiles] = await db.execute(`SELECT id FROM student_profiles WHERE user_id = ? LIMIT 1`, [req.session.user.id]);
+        const userId = req.session.user.id;
+        const [profiles] = await db.execute(`SELECT id FROM student_profiles WHERE user_id = ? LIMIT 1`, [userId]);
+        if (profiles.length === 0) {
+            req.flash('error', 'Student profile not found.');
+            return res.redirect('/student/dashboard');
+        }
         const studentId = profiles[0].id;
 
-        const filePath = '/uploads/finals/' + req.file.filename;
+        const filename = `final-${userId}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}.pdf`;
+        const filePath = await uploadDocument({
+            folder: 'finals', filename, buffer: req.file.buffer, contentType: 'application/pdf'
+        });
 
-        await db.execute(`
-            UPDATE theses 
-            SET final_file = ?, status = 'final_submitted', updated_at = NOW() 
-            WHERE student_id = ? AND status = 'proposal_approved'
-        `, [filePath, studentId]);
+        try {
+            const [result] = await db.execute(`
+                UPDATE theses 
+                SET final_file = ?, status = 'final_submitted', updated_at = NOW() 
+                WHERE student_id = ? AND status = 'proposal_approved'
+            `, [filePath, studentId]);
+            if (result.affectedRows === 0) {
+                await removeDocument(filePath);
+                req.flash('error', 'Your proposal must be approved before submitting the final thesis.');
+                return res.redirect('/student/dashboard');
+            }
+        } catch (dbError) {
+            await removeDocument(filePath);
+            throw dbError;
+        }
 
         req.flash('success', 'Final thesis uploaded successfully! Awaiting final grade from your supervisor.');
         res.redirect('/student/dashboard');

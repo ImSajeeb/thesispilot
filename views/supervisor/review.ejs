@@ -59,7 +59,7 @@
             <div class="row g-3">
                 <% if (thesis.proposal_file) { %>
                     <div class="col-md-6">
-                        <a href="<%= thesis.proposal_file %>" target="_blank" class="btn btn-outline-primary w-100 py-3 fw-semibold text-start px-4 shadow-sm bg-white d-flex align-items-center justify-content-between">
+                        <a href="/files/proposal/<%= thesis.proposal_file.split('/').pop() %>" target="_blank" class="btn btn-outline-primary w-100 py-3 fw-semibold text-start px-4 shadow-sm bg-white d-flex align-items-center justify-content-between">
                             <span><i class="bi bi-file-earmark-pdf-fill text-danger me-2 fs-5"></i> View Proposal Document</span>
                             <i class="bi bi-box-arrow-up-right"></i>
                         </a>
@@ -68,7 +68,7 @@
 
                 <% if (thesis.final_file) { %>
                     <div class="col-md-6">
-                        <a href="<%= thesis.final_file %>" target="_blank" class="btn btn-outline-success w-100 py-3 fw-semibold text-start px-4 shadow-sm bg-white d-flex align-items-center justify-content-between">
+                        <a href="/files/final/<%= thesis.final_file.split('/').pop() %>" target="_blank" class="btn btn-outline-success w-100 py-3 fw-semibold text-start px-4 shadow-sm bg-white d-flex align-items-center justify-content-between">
                             <span><i class="bi bi-award-fill text-success me-2 fs-5"></i> View Final Thesis Document</span>
                             <i class="bi bi-box-arrow-up-right"></i>
                         </a>
@@ -136,7 +136,7 @@
                                     <span class="badge bg-primary me-3">Current File</span>
                                     <span class="small fw-semibold text-secondary text-truncate" style="max-width: 250px;"><%= thesis.supervisor_feedback_file.split('/').pop() %></span>
                                 </div>
-                                <a href="<%= thesis.supervisor_feedback_file %>" target="_blank" class="btn btn-sm btn-outline-primary fw-bold">
+                                <a href="/files/feedback/<%= thesis.supervisor_feedback_file.split('/').pop() %>" target="_blank" class="btn btn-sm btn-outline-primary fw-bold">
                                     <i class="bi bi-download me-1"></i> View File
                                 </a>
                             </div>
